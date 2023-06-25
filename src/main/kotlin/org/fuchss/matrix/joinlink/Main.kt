@@ -15,6 +15,7 @@ import net.folivo.trixnity.client.room
 import net.folivo.trixnity.client.room.message.text
 import net.folivo.trixnity.client.store.repository.createInMemoryRepositoriesModule
 import net.folivo.trixnity.clientserverapi.model.authentication.IdentifierType
+import net.folivo.trixnity.clientserverapi.model.rooms.CreateRoom
 import net.folivo.trixnity.clientserverapi.model.rooms.DirectoryVisibility
 import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
@@ -137,9 +138,10 @@ private suspend fun link(roomId: RoomId, matrixBot: MatrixBot) {
 
     // Create Join Room
     val joinLink = matrixBot.rooms().createRoom(
-        visibility = DirectoryVisibility.PUBLIC,
+        visibility = DirectoryVisibility.PRIVATE,
         name = "Matrix Join Link $roomId",
         topic = "This is the Matrix Join Link Room to $roomId. You can leave the room :)",
+        preset = CreateRoom.Request.Preset.PUBLIC,
         powerLevelContentOverride = PowerLevelsEventContent(
             users = mapOf(matrixBot.self() to ADMIN_POWER_LEVEL),
             events = mapOf(
