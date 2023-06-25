@@ -1,0 +1,22 @@
+version: 2
+updates:
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "11:00"
+      timezone: "Europe/Berlin"
+    commit-message:
+      prefix: "Dependency"
+      include: "scope"
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+      time: "11:00"
+      timezone: "Europe/Berlin"
+    commit-message:
+      prefix: "Dependency"
+      include: "scope"

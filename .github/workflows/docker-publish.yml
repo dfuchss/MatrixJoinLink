@@ -1,0 +1,22 @@
+name: Docker Push
+
+on:
+  workflow_dispatch:
+  push:
+    # Publish `main` as Docker `latest` image.
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '.github/**'
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+jobs:
+  push:
+    uses: dfuchss/actions/.github/workflows/docker.yml@main
+    with:
+      image-name: matrixjoinlink
+      push: true
