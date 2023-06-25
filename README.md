@@ -1,4 +1,4 @@
-# MatrixJoinLink - A bot that allows the creation of Join Links to Rooms in Matrix
+# MatrixJoinLink - A bot that allows the creation of Join Links to non-public Rooms in Matrix
 
 This bot allows the creation of JoinLinks to rooms.
 The technical details are described on the bottom of this README.
