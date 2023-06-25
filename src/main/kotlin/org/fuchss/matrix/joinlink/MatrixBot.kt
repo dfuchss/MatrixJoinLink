@@ -156,7 +156,7 @@ class MatrixBot(private val matrixClient: MatrixClient, private val config: Conf
     private suspend fun handleJoinEvent(event: Event<MemberEventContent>) {
         val roomId = event.getRoomId() ?: return
 
-        if (!config.isUser(event.getSender())) return
+        if (!config.isUser(event.getSender()) || event.getSender() == self()) return
 
         if (event.content.membership != Membership.JOIN) {
             logger.debug("Got Membership Event: {}", event)
