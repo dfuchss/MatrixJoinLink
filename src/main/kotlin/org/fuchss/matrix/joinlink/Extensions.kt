@@ -15,6 +15,8 @@ import org.commonmark.renderer.html.HtmlRenderer
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
+internal const val ADMIN_POWER_LEVEL = 100
+
 /**
  * Same as [Flow.first] but with a defined timeout that leads to null if reached.
  * @param predicate a predicate to filter the results of [Flow.first]
@@ -38,11 +40,11 @@ fun MessageBuilder.markdown(markdown: String) {
 /**
  * Subscribe to a certain class of event. Note that you can only subscribe for events that are sent by an admin by default.
  * @param[subscriber] the function to invoke for the events
- * @param[listenNonAdmins] whether you want to subscribe for events from non admins
+ * @param[listenNonUsers] whether you want to subscribe for events from non users
  * @see MatrixBot.subscribe
  */
-inline fun <reified T : EventContent> MatrixBot.subscribe(listenNonAdmins: Boolean = false, noinline subscriber: EventSubscriber<T>) {
-    subscribe(T::class, subscriber, listenNonAdmins)
+inline fun <reified T : EventContent> MatrixBot.subscribe(listenNonUsers: Boolean = false, noinline subscriber: EventSubscriber<T>) {
+    subscribe(T::class, subscriber, listenNonUsers)
 }
 
 suspend inline fun <reified C : StateEventContent> MatrixBot.getStateEvent(

@@ -22,7 +22,7 @@ Nevertheless, I am of course interested in feedback. Feel free to use the matrix
 
 * A user (see user list) can invite the bot to a room.
 * After the bot has joined use `!join help` to get an overview about the features of the bot (remember: the bot only respond to users in the user list)
-* In order to create a Join Link simply type `!join link` and the bot will create a join link. Please make sure that the bot has the ability to invite users.
+* In order to create a Join Link simply type `!join link SomeFancyNameForTheLink` and the bot will create a join link. Please make sure that the bot has the ability to invite users.
 
 ## Development
 
@@ -34,7 +34,7 @@ Join our discussion at our matrix channel [#matrixjoinlink:fuchss.org](https://m
 ### How does the bot work
 
 1. Let's assume you have a private room with id `!private:room.domain`
-2. You invite the bot and enter `!join link`. This will create a new public room with a random id (not listed in the room directory). We call this
+2. You invite the bot and enter `!join link SomeFancyNameForTheLink`. This will create a new public room with a random id (not listed in the room directory). We call this
    room `!public123:room.domain`.
 3. The bot saves two state events: First in `!private:room.domain` a state called `org.fuchss.matrix.joinlink` that contains a pointer to the public room.
    Second, a state called `org.fuchss.matrix.rooms_to_join` in the public room that contains pointers to private rooms to join.

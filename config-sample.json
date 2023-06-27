@@ -1,10 +1,11 @@
 {
-  "prefix": "join",
-  "baseUrl": "https://matrix-client.matrix.org",
-  "username": "",
-  "password": "",
-  "users": [
-    ":invalid-server.invalid-domain",
-    "@user:invalid-server.invalid-domain"
-  ]
+    "prefix": "join",
+    "baseUrl": "https://matrix-client.matrix.org",
+    "username": "",
+    "password": "",
+    "encryptionKey": "",
+    "users": [
+        ":invalid-server.invalid-domain",
+        "@user:invalid-server.invalid-domain"
+    ]
 }

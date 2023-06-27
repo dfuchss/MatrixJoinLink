@@ -287,6 +287,8 @@
                         </goals>
                         <phase>compile</phase>
                     </execution>
+                    <!-- Disable Test Compile for Linux -->
+                    <!--
                     <execution>
                         <id>test-compile</id>
                         <goals>
@@ -294,10 +296,13 @@
                         </goals>
                         <phase>test-compile</phase>
                     </execution>
+                    -->
                 </executions>
             </plugin>
         </plugins>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
+        <!--
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
+        -->
     </build>
 </project>

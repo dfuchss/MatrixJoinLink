@@ -17,13 +17,15 @@ import java.io.File
  * @param[username] the username of the bot's account
  * @param[password] the password of the bot's account
  * @param[users] the matrix ids of the authorized users or servers. E.g. "@user:invalid.domain" or ":invalid.domain"
+ * @param[encryptionKey] a symmetric key that will be used to encrypt the event content for the bot
  */
 data class Config(
     @JsonProperty val prefix: String = "join",
     @JsonProperty val baseUrl: String,
     @JsonProperty val username: String,
     @JsonProperty val password: String,
-    @JsonProperty val users: List<String>
+    @JsonProperty val users: List<String>,
+    @JsonProperty val encryptionKey: String
 ) {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(Config::class.java)
@@ -40,6 +42,12 @@ data class Config(
 
             val config: Config = ObjectMapper().registerKotlinModule().registerModule(JavaTimeModule()).readValue(configFile)
             log.info("Loaded config ${configFile.absolutePath}")
+
+            if (config.baseUrl.isBlank() || config.username.isBlank() || config.password.isBlank() || config.encryptionKey.isBlank()) {
+                log.error("Please verify that baseUrl, username, password, and encryptionKey are not null!")
+                error("Config invalid. ")
+            }
+
             return config
         }
     }
