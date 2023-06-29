@@ -28,6 +28,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.code.style>official</kotlin.code.style>
         <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
+        <java.version>17</java.version>
 
         <kotlin.version>1.8.22</kotlin.version>
         <serialization.version>1.5.1</serialization.version>
@@ -287,8 +288,6 @@
                         </goals>
                         <phase>compile</phase>
                     </execution>
-                    <!-- Disable Test Compile for Linux -->
-                    <!--
                     <execution>
                         <id>test-compile</id>
                         <goals>
@@ -296,13 +295,10 @@
                         </goals>
                         <phase>test-compile</phase>
                     </execution>
-                    -->
                 </executions>
             </plugin>
         </plugins>
         <sourceDirectory>src/main/kotlin</sourceDirectory>
-        <!--
         <testSourceDirectory>src/test/kotlin</testSourceDirectory>
-        -->
     </build>
 </project>
