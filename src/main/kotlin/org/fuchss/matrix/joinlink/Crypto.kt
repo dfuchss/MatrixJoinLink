@@ -19,9 +19,10 @@ private val logger = LoggerFactory.getLogger("org.fuchss.matrix.joinlink.Crypto"
 
 fun RoomId.encrypt(config: Config): String = encryptRoomId(config, this)
 
+private val random = SecureRandom()
+
 @OptIn(ExperimentalEncodingApi::class)
 private fun encryptRoomId(config: Config, roomId: RoomId): String {
-    val random = SecureRandom()
     val salt = ByteArray(16)
     random.nextBytes(salt)
 
@@ -48,18 +49,17 @@ private fun decryptRoomId(config: Config, content: String?): RoomId? {
     if (content == null) return null
 
     return try {
-        val (salt, iv, encryptedContent) = content.split("|")
+        val (salt, iv, encryptedContent) = content.split("|").map { Base64.decode(it) }
 
         val factory = SecretKeyFactory.getInstance(KEY_ALGORITHM)
-        val pbeKeySpec: KeySpec = PBEKeySpec(config.encryptionKey.toCharArray(), Base64.decode(salt), 1000, 256)
+        val pbeKeySpec: KeySpec = PBEKeySpec(config.encryptionKey.toCharArray(), salt, 1000, 256)
         val secretKey = factory.generateSecret(pbeKeySpec)
         val secret = SecretKeySpec(secretKey.encoded, ENCRYPTION_ALGORITHM)
 
         val cipher = Cipher.getInstance(CIPHER_NAME)
-        cipher.init(Cipher.DECRYPT_MODE, secret, GCMParameterSpec(128, Base64.decode(iv)))
+        cipher.init(Cipher.DECRYPT_MODE, secret, GCMParameterSpec(128, iv))
 
-        val decodedEncryptedRoom = Base64.decode(encryptedContent)
-        val decrypted = cipher.doFinal(decodedEncryptedRoom)
+        val decrypted = cipher.doFinal(encryptedContent)
         RoomId(String(decrypted))
     } catch (e: Exception) {
         logger.error(e.message, e)
