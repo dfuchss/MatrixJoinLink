@@ -261,6 +261,13 @@
                                 <version>.+-(alpha|Alpha|beta|Beta|RC).*</version>
                             </ignoreVersion>
                         </rule>
+                        <rule>
+                            <groupId>net.folivo</groupId>
+                            <ignoreVersion>
+                                <type>regex</type>
+                                <version>.+-(alpha|Alpha|beta|Beta|RC).*</version>
+                            </ignoreVersion>
+                        </rule>
                     </ruleSet>
                 </configuration>
             </plugin>
