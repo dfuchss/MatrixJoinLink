@@ -30,9 +30,9 @@
         <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
         <java.version>17</java.version>
 
-        <kotlin.version>1.8.22</kotlin.version>
+        <kotlin.version>1.9.0</kotlin.version>
         <serialization.version>1.5.1</serialization.version>
-        <junit.version>5.10.0-M1</junit.version>
+        <junit.version>5.10.0-RC1</junit.version>
         <ktor.version>2.3.2</ktor.version>
         <spotless.version>2.28.0</spotless.version>
         <jackson.version>2.15.2</jackson.version>
