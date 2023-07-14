@@ -37,6 +37,6 @@ Join our discussion at our matrix channel [#matrixjoinlink:fuchss.org](https://m
 2. You invite the bot and enter `!join link SomeFancyNameForTheLink`. This will create a new public room with a random id (not listed in the room directory). We call this
    room `!public123:room.domain`.
 3. The bot saves two state events: First in `!private:room.domain` a state called `org.fuchss.matrix.joinlink` that contains a pointer to the public room.
-   Second, a state called `org.fuchss.matrix.rooms_to_join` in the public room that contains pointers to private rooms to join.
+   Second, a state called `org.fuchss.matrix.room_to_join` in the public room that contains pointers to the private room to join.
 4. If someone joins the public room, the bot reads the protected state from the public room and invites the user to all roomIds that are present in the state.
 5. If you want to invalidate the join link, you can simply type `!join unlink`.

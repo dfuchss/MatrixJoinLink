@@ -11,7 +11,7 @@ import org.fuchss.matrix.joinlink.MatrixBot
 import org.fuchss.matrix.joinlink.decrypt
 import org.fuchss.matrix.joinlink.encrypt
 import org.fuchss.matrix.joinlink.events.JoinLinkEventContent
-import org.fuchss.matrix.joinlink.events.RoomsToJoinEventContent
+import org.fuchss.matrix.joinlink.events.RoomToJoinEventContent
 import org.fuchss.matrix.joinlink.getStateEvent
 import org.fuchss.matrix.joinlink.matrixTo
 import org.slf4j.Logger
@@ -45,7 +45,7 @@ internal suspend fun link(roomId: RoomId, matrixBot: MatrixBot, config: Config, 
         powerLevelContentOverride = PowerLevelsEventContent(
             users = mapOf(matrixBot.self() to ADMIN_POWER_LEVEL),
             events = mapOf(
-                RoomsToJoinEventContent.ID to ADMIN_POWER_LEVEL,
+                RoomToJoinEventContent.ID to ADMIN_POWER_LEVEL,
                 JoinLinkEventContent.ID to ADMIN_POWER_LEVEL
             ),
             eventsDefault = ADMIN_POWER_LEVEL,
@@ -57,7 +57,7 @@ internal suspend fun link(roomId: RoomId, matrixBot: MatrixBot, config: Config, 
     val joinLinkEvent = JoinLinkEventContent(joinLink.encrypt(config))
     matrixBot.sendStateEvent(roomId, joinLinkEvent)
 
-    val roomsToJoinEvent = RoomsToJoinEventContent(listOf(roomId.encrypt(config)))
+    val roomsToJoinEvent = RoomToJoinEventContent(roomId.encrypt(config))
     matrixBot.sendStateEvent(joinLink, roomsToJoinEvent)
 
     matrixBot.room().sendMessage(roomId) { text("Link to share the Room: ${joinLink.matrixTo()}") }

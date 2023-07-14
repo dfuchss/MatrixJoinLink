@@ -13,7 +13,7 @@ import org.fuchss.matrix.joinlink.Config
 import org.fuchss.matrix.joinlink.MatrixBot
 import org.fuchss.matrix.joinlink.decrypt
 import org.fuchss.matrix.joinlink.events.JoinLinkEventContent
-import org.fuchss.matrix.joinlink.events.RoomsToJoinEventContent
+import org.fuchss.matrix.joinlink.events.RoomToJoinEventContent
 import org.fuchss.matrix.joinlink.getStateEvent
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -70,8 +70,8 @@ private suspend fun handleValidJoinEvent(
     matrixBot: MatrixBot,
     config: Config
 ) {
-    val roomsToJoin = matrixBot.getStateEvent<RoomsToJoinEventContent>(roomId).getOrNull() ?: return
-    if (roomsToJoin.roomsToJoin.isNullOrEmpty()) {
+    val roomToJoinState = matrixBot.getStateEvent<RoomToJoinEventContent>(roomId).getOrNull() ?: return
+    if (roomToJoinState.roomToJoin.isNullOrEmpty()) {
         return
     }
 
@@ -89,18 +89,22 @@ private suspend fun handleValidJoinEvent(
 
     matrixBot.room().sendMessage(roomId) { text(message) }
 
-    for (roomToJoin in roomsToJoin.roomsToJoin.mapNotNull { it.decrypt(config) }) {
-        // Validate RoomsToJoin ..
-        val currentJoinLink = matrixBot.getStateEvent<JoinLinkEventContent>(roomToJoin).getOrNull()?.joinlinkRoom.decrypt(config)
-        if (currentJoinLink != roomId) {
-            logger.error("I will not invite $userId to $roomToJoin because the link to $roomId is broken. Skipping ..")
-            continue
-        }
+    val roomToJoin = roomToJoinState.roomToJoin.decrypt(config)
+    if (roomToJoin == null) {
+        logger.debug("Skipping MemberEvent {} for user {} in {} because the link is broken", eventId, userId, roomId)
+        return
+    }
 
-        try {
-            matrixBot.rooms().inviteUser(roomToJoin, userId, reason = "Join via MatrixJoinLink").getOrThrow()
-        } catch (e: Exception) {
-            logger.error(e.message, e)
-        }
+    // Validate RoomsToJoin ..
+    val currentJoinLink = matrixBot.getStateEvent<JoinLinkEventContent>(roomToJoin).getOrNull()?.joinlinkRoom.decrypt(config)
+    if (currentJoinLink != roomId) {
+        logger.error("I will not invite $userId to $roomToJoin because the link to $roomId is broken. Skipping ..")
+        return
+    }
+
+    try {
+        matrixBot.rooms().inviteUser(roomToJoin, userId, reason = "Join via MatrixJoinLink").getOrThrow()
+    } catch (e: Exception) {
+        logger.error(e.message, e)
     }
 }

@@ -11,7 +11,7 @@ import org.koin.dsl.module
 private val joinLinkSerializationMapping = object : BaseEventContentSerializerMappings() {
     override val state: Set<SerializerMapping<out StateEventContent>> = setOf(
         of<JoinLinkEventContent>(JoinLinkEventContent.ID),
-        of<RoomsToJoinEventContent>(RoomsToJoinEventContent.ID)
+        of<RoomToJoinEventContent>(RoomToJoinEventContent.ID)
     )
 }
 
