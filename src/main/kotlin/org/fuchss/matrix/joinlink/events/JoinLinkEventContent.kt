@@ -3,6 +3,7 @@ package org.fuchss.matrix.joinlink.events
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.folivo.trixnity.core.model.RoomId
+import net.folivo.trixnity.core.model.events.EventType
 import net.folivo.trixnity.core.model.events.StateEventContent
 import org.fuchss.matrix.joinlink.Config
 import javax.crypto.Cipher
@@ -15,7 +16,7 @@ data class JoinLinkEventContent(
     @SerialName("joinlink_room") val joinlinkRoom: String? = null
 ) : StateEventContent {
     companion object {
-        const val ID = "org.fuchss.matrix.joinlink"
+        val ID = EventType(JoinLinkEventContent::class, "org.fuchss.matrix.joinlink")
 
         private const val ENCRYPTION_ALGORITHM = "AES/GCM/NoPadding"
         private const val KEY_ALGORITHM = "AES"
