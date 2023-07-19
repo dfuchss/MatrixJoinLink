@@ -36,7 +36,7 @@
         <ktor.version>2.3.2</ktor.version>
         <spotless.version>2.28.0</spotless.version>
         <jackson.version>2.15.2</jackson.version>
-        <trixnity.version>3.7.0</trixnity.version>
+        <trixnity.version>3.7.1</trixnity.version>
         <slf4j.version>2.0.7</slf4j.version>
         <main.class>org.fuchss.matrix.joinlink.MainKt</main.class>
     </properties>
