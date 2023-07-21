@@ -33,7 +33,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <trixnity.version>3.7.1</trixnity.version>
+        <trixnity.version>3.7.2</trixnity.version>
         <serialization.version>1.5.1</serialization.version>
         <main.class>org.fuchss.matrix.joinlink.MainKt</main.class>
     </properties>
