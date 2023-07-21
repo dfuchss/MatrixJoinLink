@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.fuchss</groupId>
+        <artifactId>maven-parent</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+
     <groupId>org.fuchss.matrix</groupId>
     <artifactId>matrixjoinlink</artifactId>
     <version>0.2.0-SNAPSHOT</version>
@@ -26,18 +33,8 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.code.style>official</kotlin.code.style>
-        <kotlin.compiler.jvmTarget>17</kotlin.compiler.jvmTarget>
-        <java.version>17</java.version>
-
-        <kotlin.version>1.9.0</kotlin.version>
-        <serialization.version>1.5.1</serialization.version>
-        <junit.version>5.10.0-RC1</junit.version>
-        <ktor.version>2.3.2</ktor.version>
-        <spotless.version>2.28.0</spotless.version>
-        <jackson.version>2.15.2</jackson.version>
         <trixnity.version>3.7.0</trixnity.version>
-        <slf4j.version>2.0.7</slf4j.version>
+        <serialization.version>1.5.1</serialization.version>
         <main.class>org.fuchss.matrix.joinlink.MainKt</main.class>
     </properties>
 
@@ -45,37 +42,30 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-kotlin</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>io.ktor</groupId>
             <artifactId>ktor-client-content-negotiation-jvm</artifactId>
-            <version>${ktor.version}</version>
         </dependency>
         <dependency>
             <groupId>io.ktor</groupId>
             <artifactId>ktor-client-java-jvm</artifactId>
-            <version>${ktor.version}</version>
         </dependency>
         <dependency>
             <groupId>io.ktor</groupId>
             <artifactId>ktor-serialization-jackson-jvm</artifactId>
-            <version>${ktor.version}</version>
         </dependency>
         <dependency>
             <groupId>net.folivo</groupId>
@@ -95,12 +85,10 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
-            <version>${kotlin.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
-            <version>${kotlin.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -152,6 +140,16 @@
             <id>mavenCentral</id>
             <url>https://repo1.maven.org/maven2/</url>
         </repository>
+        <repository>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>mavenSnapshot</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
     </repositories>
 
     <build>
@@ -159,20 +157,7 @@
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
-                <version>2.37.0</version>
-                <configuration>
-                    <pom>
-                        <sortPom>
-                            <encoding>UTF-8</encoding>
-                            <keepBlankLines>true</keepBlankLines>
-                            <indentBlankLines>false</indentBlankLines>
-                            <nrOfIndentSpace>4</nrOfIndentSpace>
-                            <expandEmptyElements>false</expandEmptyElements>
-                            <sortModules>true</sortModules>
-                            <sortPlugins>groupId,artifactId</sortPlugins>
-                            <sortDependencies>groupId,artifactId</sortDependencies>
-                        </sortPom>
-                    </pom>
+                <configuration combine.self="append">
                     <kotlin>
                         <ktlint>
                             <editorConfigPath>.editorconfig</editorConfigPath>
@@ -192,7 +177,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.6.0</version>
                 <executions>
                     <execution>
                         <id>make-assembly</id>
@@ -216,16 +200,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -237,39 +215,11 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>3.0.1</version>
-                <configuration>
-                    <tagNameFormat>v@{project.version}</tagNameFormat>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.2</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
-                <version>2.16.0</version>
-                <configuration>
-                    <ruleSet>
-                        <rule>
-                            <groupId>org.jetbrains.kotlin</groupId>
-                            <ignoreVersion>
-                                <type>regex</type>
-                                <version>.+-(alpha|Alpha|beta|Beta|RC).*</version>
-                            </ignoreVersion>
-                        </rule>
-                        <rule>
-                            <groupId>net.folivo</groupId>
-                            <ignoreVersion>
-                                <type>regex</type>
-                                <version>.+-(alpha|Alpha|beta|Beta|RC).*</version>
-                            </ignoreVersion>
-                        </rule>
-                    </ruleSet>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
