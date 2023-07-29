@@ -17,6 +17,9 @@ private const val KEY_ALGORITHM = "PBKDF2WithHmacSHA256"
 private const val TRANSFORMATION_NAME = "AES/GCM/NoPadding"
 private val logger = LoggerFactory.getLogger("org.fuchss.matrix.joinlink.Crypto")
 
+/**
+ * Encrypt a [RoomId] to a string using the [Config].
+ */
 fun RoomId.encrypt(config: Config): String = encryptRoomId(config, this)
 
 private val random = SecureRandom()
@@ -41,6 +44,9 @@ private fun encryptRoomId(config: Config, roomId: RoomId): String {
     return "${Base64.encode(salt)}|${Base64.encode(iv)}|${Base64.encode(encrypted)}"
 }
 
+/**
+ * Decrypt a [RoomId] from a string using the [Config].
+ */
 fun String?.decrypt(config: Config): RoomId? = decryptRoomId(config, this)
 
 @OptIn(ExperimentalEncodingApi::class)

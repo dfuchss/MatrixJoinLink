@@ -32,6 +32,9 @@ import kotlin.random.Random
 
 private val logger: Logger = LoggerFactory.getLogger(MatrixBot::class.java)
 
+/**
+ * The main function to start the bot.
+ */
 fun main() {
     runBlocking {
         val config = Config.load()

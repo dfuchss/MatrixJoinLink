@@ -13,6 +13,12 @@ import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(MatrixBot::class.java)
 
+/**
+ * Unlink a Matrix Join Link Room.
+ * @param[roomId] The roomId of the unlink request.
+ * @param[matrixBot] The bot to handle the unlink request.
+ * @param[config] The config to use.
+ */
 internal suspend fun unlink(roomId: RoomId, config: Config, matrixBot: MatrixBot) {
     logger.info("Requested Unlink for $roomId")
 

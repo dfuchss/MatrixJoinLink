@@ -24,6 +24,18 @@ private val recentHandledJoinEvents = ConcurrentHashMap<String, Long>()
 
 private val logger: Logger = LoggerFactory.getLogger(MatrixBot::class.java)
 
+/**
+ * Handle a MemberEvent in a room where the bot is present.
+ * If the bot has admin rights in the room, it will check if the user joined a JoinLinkRoom.
+ * If so, it will send the user an invite to the room the JoinLinkRoom is linked to.
+ * @param[eventId] The EventId of the MemberEvent. If null, the roomId and userId will be used to create a unique id.
+ * @param[originTimestamp] The originTimestamp of the MemberEvent. If null, the current time will be used.
+ * @param[roomId] The roomId of the MemberEvent.
+ * @param[userId] The userId of the MemberEvent.
+ * @param[memberEventContent] The MemberEventContent of the MemberEvent.
+ * @param[matrixBot] The bot to handle the MemberEvent.
+ * @param[config] The config to use.
+ */
 internal suspend fun handleJoinsToMatrixJoinLinkRooms(
     eventId: EventId?,
     originTimestamp: Long?,
@@ -62,6 +74,15 @@ internal suspend fun handleJoinsToMatrixJoinLinkRooms(
     )
 }
 
+/**
+ * Handle a MemberEvent in a room where the bot identifies a JoinLinkRoom.
+ * @param[eventId] The EventId of the MemberEvent.
+ * @param[originTimestamp] The originTimestamp of the MemberEvent.
+ * @param[roomId] The roomId of the MemberEvent.
+ * @param[userId] The userId of the MemberEvent.
+ * @param[matrixBot] The bot to handle the MemberEvent.
+ * @param[config] The config to use.
+ */
 private suspend fun handleValidJoinEvent(
     eventId: String,
     originTimestamp: Long,

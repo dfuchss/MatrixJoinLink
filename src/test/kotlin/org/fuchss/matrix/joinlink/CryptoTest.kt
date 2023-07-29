@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class CryptoTest {
+    /**
+     * Test the encryption and decryption of a room id.
+     */
     @Test
     fun testEnDeCrypt() {
         val config = Config("prefix", "test", "user", "password", listOf<String>(), "test123")

@@ -19,6 +19,13 @@ import org.slf4j.LoggerFactory
 
 private val logger: Logger = LoggerFactory.getLogger(MatrixBot::class.java)
 
+/**
+ * Handle a link request. If the message originates from a user that is authorized, the bot tries to create a JoinLinkRoom (or uses an existing one).
+ * @param[roomId] The roomId of the link request.
+ * @param[matrixBot] The bot to handle the link request.
+ * @param[config] The config to use.
+ * @param[message] The message of the link request.
+ */
 internal suspend fun link(roomId: RoomId, matrixBot: MatrixBot, config: Config, message: String) {
     logger.info("Requested Link for $roomId")
 

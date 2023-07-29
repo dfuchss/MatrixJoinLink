@@ -5,6 +5,12 @@ import org.fuchss.matrix.joinlink.Config
 import org.fuchss.matrix.joinlink.MatrixBot
 import org.fuchss.matrix.joinlink.markdown
 
+/**
+ * Show the help message.
+ * @param[roomId] The room to show the help message in.
+ * @param[matrixBot] The bot to show the help message.
+ * @param[config] The config to use.
+ */
 internal suspend fun help(roomId: RoomId, matrixBot: MatrixBot, config: Config) {
     val helpMessage = """
         This is the MatrixJoinLink Bot. You can use the following commands:

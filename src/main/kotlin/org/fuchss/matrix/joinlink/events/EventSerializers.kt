@@ -15,6 +15,9 @@ private val joinLinkSerializationMapping = object : BaseEventContentSerializerMa
     )
 }
 
+/**
+ * Koin module for the joinlink events.
+ */
 val joinLinkModule = module {
     single<EventContentSerializerMappings> {
         DefaultEventContentSerializerMappings + joinLinkSerializationMapping

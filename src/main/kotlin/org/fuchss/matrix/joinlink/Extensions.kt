@@ -47,6 +47,12 @@ inline fun <reified T : EventContent> MatrixBot.subscribe(listenNonUsers: Boolea
     subscribe(T::class, subscriber, listenNonUsers)
 }
 
+/**
+ * Get a state event from a room
+ * @param[C] the type of the event [StateEventContent]
+ * @param[roomId] the room to get the event from
+ * @return the event
+ */
 suspend inline fun <reified C : StateEventContent> MatrixBot.getStateEvent(
     roomId: RoomId
 ): Result<C> {
@@ -55,10 +61,8 @@ suspend inline fun <reified C : StateEventContent> MatrixBot.getStateEvent(
     return getStateEvent(type, roomId) as Result<C>
 }
 
-inline fun <reified K, reified V> Map<K, V>.with(key: K, value: V): Map<K, V> {
-    val mutable = this.toMutableMap()
-    mutable[key] = value
-    return mutable
-}
-
+/**
+ * Create a matrix.to link from a RoomId
+ * @return the matrix.to link
+ */
 fun RoomId.matrixTo(): String = "https://matrix.to/#/${this.full}?via=${this.domain}"

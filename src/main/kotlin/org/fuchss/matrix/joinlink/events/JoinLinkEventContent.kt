@@ -11,6 +11,10 @@ import javax.crypto.spec.SecretKeySpec
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
+/**
+ * The content of a joinlink event.
+ * @param[joinlinkRoom] The encrypted room id of the public room (JoinLinkRoom).
+ */
 @Serializable
 data class JoinLinkEventContent(
     @SerialName("joinlink_room") val joinlinkRoom: String? = null
