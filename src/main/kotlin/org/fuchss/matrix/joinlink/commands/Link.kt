@@ -4,6 +4,7 @@ import net.folivo.trixnity.client.room.message.text
 import net.folivo.trixnity.clientserverapi.model.rooms.CreateRoom
 import net.folivo.trixnity.clientserverapi.model.rooms.DirectoryVisibility
 import net.folivo.trixnity.core.model.RoomId
+import net.folivo.trixnity.core.model.events.m.room.HistoryVisibilityEventContent
 import net.folivo.trixnity.core.model.events.m.room.PowerLevelsEventContent
 import org.fuchss.matrix.joinlink.ADMIN_POWER_LEVEL
 import org.fuchss.matrix.joinlink.Config
@@ -59,6 +60,9 @@ internal suspend fun link(roomId: RoomId, matrixBot: MatrixBot, config: Config, 
             stateDefault = ADMIN_POWER_LEVEL
         )
     ).getOrThrow()
+
+    // Set History Visibility to Joined to prevent others from seeing too much history
+    matrixBot.rooms().sendStateEvent(joinLink, HistoryVisibilityEventContent(HistoryVisibilityEventContent.HistoryVisibility.JOINED)).getOrThrow()
 
     logger.info("Create Room $joinLink for $roomId")
     val joinLinkEvent = JoinLinkEventContent(joinLink.encrypt(config))

@@ -15,6 +15,7 @@ import org.fuchss.matrix.joinlink.decrypt
 import org.fuchss.matrix.joinlink.events.JoinLinkEventContent
 import org.fuchss.matrix.joinlink.events.RoomToJoinEventContent
 import org.fuchss.matrix.joinlink.getStateEvent
+import org.fuchss.matrix.joinlink.markdown
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
@@ -123,12 +124,17 @@ private suspend fun handleValidJoinEvent(
     }
 
     try {
+        val joinedMembers = matrixBot.rooms().getJoinedMembers(roomToJoin).getOrNull() ?: return
+        if (joinedMembers.joined.containsKey(userId)) {
+            logger.debug("Skipping MemberEvent {} for user {} in {} because the user is already in the room", eventId, userId, roomId)
+            return
+        }
         matrixBot.rooms().inviteUser(roomToJoin, userId, reason = "Join via MatrixJoinLink").getOrThrow()
     } catch (e: Exception) {
         logger.error(e.message, e)
-        matrixBot.room().sendMessage(roomToJoin) { text("I could not invite $userId to the room. Please invite them manually.") }
+        matrixBot.room().sendMessage(roomToJoin) { markdown("**I could not invite $userId to the room. Please invite them manually.**") }
         matrixBot.room().sendMessage(roomId) {
-            text("I could not invite you to the room. Please ask the person who gave you the link that they can invite you manually.")
+            markdown("**I could not invite you to the room. Please ask the person who gave you the link that they can invite you manually.**")
         }
     }
 }

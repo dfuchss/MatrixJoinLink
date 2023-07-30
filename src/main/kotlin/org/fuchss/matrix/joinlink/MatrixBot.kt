@@ -134,6 +134,10 @@ class MatrixBot(private val matrixClient: MatrixClient, private val config: Conf
         matrixClient.stopSync()
     }
 
+    suspend fun rename(newName: String) {
+        matrixClient.api.users.setDisplayName(matrixClient.userId, newName)
+    }
+
     /**
      * Rename the bot in a certain room.
      * @param[roomId] the room id of the room

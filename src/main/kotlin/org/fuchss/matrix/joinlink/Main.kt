@@ -104,7 +104,7 @@ private suspend fun handleTextMessage(roomId: RoomId?, content: RoomMessageEvent
     when (message.split(Regex(" "), 2)[0]) {
         "quit" -> matrixBot.quit()
         "help" -> help(roomId, matrixBot, config)
-        "name" -> changeUsername(roomId, matrixBot, message)
+        "name" -> changeUsername(matrixBot, message)
         "link" -> link(roomId, matrixBot, config, message)
         "unlink" -> unlink(roomId, config, matrixBot)
     }

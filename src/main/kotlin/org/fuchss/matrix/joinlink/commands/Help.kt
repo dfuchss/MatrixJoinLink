@@ -17,7 +17,7 @@ internal suspend fun help(roomId: RoomId, matrixBot: MatrixBot, config: Config) 
         
         * `!${config.prefix} help - shows this help message`
         * `!${config.prefix} quit - quits the bot`
-        * `!${config.prefix} name [NEW_NAME] - sets the display name of the bot to NEW_NAME (only for the room)`
+        * `!${config.prefix} name [NEW_NAME] - sets the display name of the bot to NEW_NAME`
         * `!${config.prefix} link [Readable Name of Link] - create a join link for the room`
         * `!${config.prefix} unlink - remove all join links for the room`
     """.trimIndent()
