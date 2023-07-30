@@ -103,12 +103,11 @@ private suspend fun handleValidJoinEvent(
 
     logger.info("Inviting $userId to rooms because of JoinEvent to $roomId")
 
-    val message = "" +
+    val welcomeMessage = "" +
         "You've reached a MatrixJoinRoom. I'll invite you to the rooms ..\n" +
-        "If this does not work, please ask the person who gave you the link that they can invite you manually.\n\n" +
         "You can leave the room now :)"
 
-    matrixBot.room().sendMessage(roomId) { text(message) }
+    matrixBot.room().sendMessage(roomId) { text(welcomeMessage) }
 
     val roomToJoin = roomToJoinState.roomToJoin.decrypt(config)
     if (roomToJoin == null) {
@@ -119,7 +118,7 @@ private suspend fun handleValidJoinEvent(
     // Validate RoomsToJoin ..
     val currentJoinLink = matrixBot.getStateEvent<JoinLinkEventContent>(roomToJoin).getOrNull()?.joinlinkRoom.decrypt(config)
     if (currentJoinLink != roomId) {
-        logger.error("I will not invite $userId to $roomToJoin because the link to $roomId is broken. Skipping ..")
+        logger.error("I will not invite $userId to $roomToJoin because the link to $roomId is broken ($currentJoinLink <-> $roomId). Skipping ..")
         return
     }
 
@@ -127,5 +126,9 @@ private suspend fun handleValidJoinEvent(
         matrixBot.rooms().inviteUser(roomToJoin, userId, reason = "Join via MatrixJoinLink").getOrThrow()
     } catch (e: Exception) {
         logger.error(e.message, e)
+        matrixBot.room().sendMessage(roomToJoin) { text("I could not invite $userId to the room. Please invite them manually.") }
+        matrixBot.room().sendMessage(roomId) {
+            text("I could not invite you to the room. Please ask the person who gave you the link that they can invite you manually.")
+        }
     }
 }
