@@ -22,7 +22,7 @@ internal const val ADMIN_POWER_LEVEL = 100
  * @param predicate a predicate to filter the results of [Flow.first]
  * @return the result of [Flow.first] or null
  */
-suspend fun <T> Flow<T>.firstWithTimeout(timeout: Duration = 1000.milliseconds, predicate: suspend (T) -> Boolean): T? {
+suspend fun <T> Flow<T>.firstWithTimeout(timeout: Duration = 3000.milliseconds, predicate: suspend (T) -> Boolean): T? {
     val that = this
     return withTimeoutOrNull(timeout) { that.first { predicate(it) } }
 }
