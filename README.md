@@ -17,6 +17,7 @@ can invite _JoinLink_ and create an invite link. This link can be shared to my f
 2. Prepare configuration:
     * Copy `config-sample.json` to `config.json`
     * Enter `baseUrl` to the matrix server and `username` / `password` for the bot user
+    * Set an encryption key. The bot will use this string as key to encrypt the state events.
     * Add yourself (e.g., `@user:matrix.org`) or your homeserver (e.g., `:matrix.org`) to the `users` (empty list == allow all)
 3. Either run the bot via jar or run it via the provided docker.
     * If you run it locally, you can use the environment variable `CONFIG_PATH` to point at your `config.json` (defaults to `./config.json`)
