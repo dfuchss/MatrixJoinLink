@@ -1,11 +1,15 @@
-package org.fuchss.matrix.joinlink.commands
+package org.fuchss.matrix.joinlink.handler
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import net.folivo.trixnity.client.getEventId
+import net.folivo.trixnity.client.getOriginTimestamp
+import net.folivo.trixnity.client.getRoomId
+import net.folivo.trixnity.client.getSender
 import net.folivo.trixnity.client.room.message.text
-import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
+import net.folivo.trixnity.core.model.events.Event
 import net.folivo.trixnity.core.model.events.m.room.MemberEventContent
 import net.folivo.trixnity.core.model.events.m.room.Membership
 import org.fuchss.matrix.joinlink.ADMIN_POWER_LEVEL
@@ -19,9 +23,11 @@ import org.fuchss.matrix.joinlink.markdown
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Semaphore
 import kotlin.time.Duration.Companion.seconds
 
-private val recentHandledJoinEvents = ConcurrentHashMap<String, Long>()
+private val recentHandledJoinEventIdToTimestamp = ConcurrentHashMap<String, Long>()
+private val userIdLocks = ConcurrentHashMap<UserId, Semaphore>()
 
 private val logger: Logger = LoggerFactory.getLogger(MatrixBot::class.java)
 
@@ -29,23 +35,15 @@ private val logger: Logger = LoggerFactory.getLogger(MatrixBot::class.java)
  * Handle a MemberEvent in a room where the bot is present.
  * If the bot has admin rights in the room, it will check if the user joined a JoinLinkRoom.
  * If so, it will send the user an invite to the room the JoinLinkRoom is linked to.
- * @param[eventId] The EventId of the MemberEvent. If null, the roomId and userId will be used to create a unique id.
- * @param[originTimestamp] The originTimestamp of the MemberEvent. If null, the current time will be used.
- * @param[roomId] The roomId of the MemberEvent.
- * @param[userId] The userId of the MemberEvent.
+ * @param[event] The event to handle
  * @param[memberEventContent] The MemberEventContent of the MemberEvent.
  * @param[matrixBot] The bot to handle the MemberEvent.
  * @param[config] The config to use.
  */
-internal suspend fun handleJoinsToMatrixJoinLinkRooms(
-    eventId: EventId?,
-    originTimestamp: Long?,
-    roomId: RoomId?,
-    userId: UserId?,
-    memberEventContent: MemberEventContent,
-    matrixBot: MatrixBot,
-    config: Config
-) {
+internal suspend fun handleJoinsToMatrixJoinLinkRooms(event: Event<*>, memberEventContent: MemberEventContent, matrixBot: MatrixBot, config: Config) {
+    val roomId = event.getRoomId()
+    val userId = event.getSender()
+
     if (roomId == null || userId == null) {
         return
     }
@@ -63,16 +61,19 @@ internal suspend fun handleJoinsToMatrixJoinLinkRooms(
 
     // Cleanup recent list
     val now = Clock.System.now()
-    recentHandledJoinEvents.toMap().filter { now - Instant.fromEpochMilliseconds(it.value) > 20.seconds }.forEach { recentHandledJoinEvents.remove(it.key) }
+    recentHandledJoinEventIdToTimestamp.toMap().filter {
+        now - Instant.fromEpochMilliseconds(it.value) > 20.seconds
+    }.forEach { recentHandledJoinEventIdToTimestamp.remove(it.key) }
 
-    handleValidJoinEvent(
-        eventId?.full ?: "$roomId-$userId",
-        originTimestamp ?: now.toEpochMilliseconds(),
-        roomId,
-        userId,
-        matrixBot,
-        config
-    )
+    val eventId = event.getEventId()?.full ?: "$roomId-$userId"
+    val originTimestamp = event.getOriginTimestamp() ?: now.toEpochMilliseconds()
+
+    try {
+        acquireUserLock(userId)
+        handleValidJoinEvent(eventId, originTimestamp, roomId, userId, matrixBot, config)
+    } finally {
+        releaseUserLock(userId)
+    }
 }
 
 /**
@@ -84,20 +85,13 @@ internal suspend fun handleJoinsToMatrixJoinLinkRooms(
  * @param[matrixBot] The bot to handle the MemberEvent.
  * @param[config] The config to use.
  */
-private suspend fun handleValidJoinEvent(
-    eventId: String,
-    originTimestamp: Long,
-    roomId: RoomId,
-    userId: UserId,
-    matrixBot: MatrixBot,
-    config: Config
-) {
+private suspend fun handleValidJoinEvent(eventId: String, originTimestamp: Long, roomId: RoomId, userId: UserId, matrixBot: MatrixBot, config: Config) {
     val roomToJoinState = matrixBot.getStateEvent<RoomToJoinEventContent>(roomId).getOrNull() ?: return
     if (roomToJoinState.roomToJoin.isNullOrEmpty()) {
         return
     }
 
-    if (recentHandledJoinEvents.putIfAbsent(eventId, originTimestamp) != null) {
+    if (recentHandledJoinEventIdToTimestamp.putIfAbsent(eventId, originTimestamp) != null) {
         logger.debug("Skipping MemberEvent {} for user {} in {} because it was already handled", eventId, userId, roomId)
         return
     }
@@ -138,3 +132,14 @@ private suspend fun handleValidJoinEvent(
         }
     }
 }
+
+private fun acquireUserLock(userId: UserId) {
+    var lock = userIdLocks[userId]
+    if (lock == null) {
+        val newLock = Semaphore(1)
+        val actualLock = userIdLocks.putIfAbsent(userId, newLock)
+        lock = actualLock ?: newLock
+    }
+    lock.acquireUninterruptibly()
+}
+private fun releaseUserLock(userId: UserId) = userIdLocks[userId]?.release()
