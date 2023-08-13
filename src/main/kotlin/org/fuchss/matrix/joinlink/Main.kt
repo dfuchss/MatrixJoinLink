@@ -61,7 +61,7 @@ fun main() {
 }
 
 private suspend fun getMatrixClient(config: Config): MatrixClient {
-    val existingMatrixClient = MatrixClient.fromStore(createRepositoriesModule(config), createMediaStore(config))    {
+    val existingMatrixClient = MatrixClient.fromStore(createRepositoriesModule(config), createMediaStore(config)) {
         modules = createDefaultModules() + joinLinkModule
     }.getOrThrow()
     if (existingMatrixClient != null) {
