@@ -39,14 +39,17 @@ class MatrixBot(private val matrixClient: MatrixClient, private val config: Conf
     private val runningLock = Semaphore(1, 1)
     private var running: Boolean = false
 
+    private var logout: Boolean = false
+
     init {
         matrixClient.api.sync.subscribe { event -> handleJoinEvent(event) }
     }
 
     /**
      * Starts the bot. Note that this method blocks until [quit] will be executed from another thread.
+     * @return true if the bot was logged out, false if the bot simply quit.
      */
-    suspend fun startBlocking() {
+    suspend fun startBlocking(): Boolean {
         running = true
         registerShutdownHook()
 
@@ -62,7 +65,13 @@ class MatrixBot(private val matrixClient: MatrixClient, private val config: Conf
             delay(500)
         }
         running = false
-        matrixClient.api.authentication.logoutAll()
+        if (logout) {
+            matrixClient.api.authentication.logoutAll()
+        }
+
+        matrixClient.stop()
+
+        return logout
     }
 
     /**
@@ -129,9 +138,10 @@ class MatrixBot(private val matrixClient: MatrixClient, private val config: Conf
     /**
      * Quit the bot. This will end the lock of [startBlocking]. Additionally, it will log out all instances of the bot user.
      */
-    suspend fun quit() {
-        runningLock.release()
+    suspend fun quit(logout: Boolean = false) {
+        this.logout = logout
         matrixClient.stopSync()
+        runningLock.release()
     }
 
     suspend fun rename(newName: String) {

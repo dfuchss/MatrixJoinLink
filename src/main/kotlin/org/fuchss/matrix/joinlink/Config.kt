@@ -16,6 +16,7 @@ import java.io.File
  * @param[baseUrl] the base url of the matrix server the bot shall use
  * @param[username] the username of the bot's account
  * @param[password] the password of the bot's account
+ * @param[dataDirectory] the path to the databases and media folder
  * @param[users] the matrix ids of the authorized users or servers. E.g. "@user:invalid.domain" or ":invalid.domain"
  * @param[encryptionKey] a symmetric key that will be used to encrypt the event content for the bot
  */
@@ -24,6 +25,7 @@ data class Config(
     @JsonProperty val baseUrl: String,
     @JsonProperty val username: String,
     @JsonProperty val password: String,
+    @JsonProperty val dataDirectory: String,
     @JsonProperty val users: List<String>,
     @JsonProperty val encryptionKey: String
 ) {

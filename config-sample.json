@@ -1,6 +1,7 @@
 {
     "prefix": "join",
     "baseUrl": "https://matrix-client.matrix.org",
+    "dataDirectory": "./data/",
     "username": "",
     "password": "",
     "encryptionKey": "",
