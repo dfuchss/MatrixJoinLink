@@ -1,6 +1,7 @@
 package org.fuchss.matrix.joinlink.handler.command
 
 import net.folivo.trixnity.core.model.RoomId
+import net.folivo.trixnity.core.model.UserId
 import org.fuchss.matrix.joinlink.Config
 import org.fuchss.matrix.joinlink.MatrixBot
 import org.fuchss.matrix.joinlink.markdown
@@ -12,10 +13,11 @@ internal class HelpCommand(private val config: Config, private val commandGetter
     /**
      * Show the help message.
      * @param[matrixBot] The bot to show the help message.
+     * @param[sender] The sender of the command.
      * @param[roomId] The room to show the help message in.
      * @param[parameters] The parameters of the command.
      */
-    override suspend fun execute(matrixBot: MatrixBot, roomId: RoomId, parameters: String) {
+    override suspend fun execute(matrixBot: MatrixBot, sender: UserId, roomId: RoomId, parameters: String) {
         var helpMessage = "This is the JoinLink Bot. You can use the following commands:\n"
 
         for (command in commandGetter()) {

@@ -17,6 +17,7 @@ import net.folivo.trixnity.clientserverapi.client.SyncState
 import net.folivo.trixnity.core.EventSubscriber
 import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
+import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.Event
 import net.folivo.trixnity.core.model.events.EventContent
 import net.folivo.trixnity.core.model.events.StateEventContent
@@ -110,6 +111,20 @@ class MatrixBot(private val matrixClient: MatrixClient, private val config: Conf
     suspend fun permissionLevel(roomId: RoomId): Int {
         val levels = getStateEvent<PowerLevelsEventContent>(roomId).getOrThrow()
         return levels.users[matrixClient.userId] ?: levels.usersDefault
+    }
+
+    suspend fun canInvite(roomId: RoomId, userId: UserId? = null): Boolean {
+        val levels = getStateEvent<PowerLevelsEventContent>(roomId).getOrThrow()
+        val levelToInvite = levels.invite
+        val userLevel = levels.users[userId ?: matrixClient.userId] ?: levels.usersDefault
+        return userLevel >= levelToInvite
+    }
+
+    suspend fun canSendStateEvents(roomId: RoomId, userId: UserId? = null): Boolean {
+        val levels = getStateEvent<PowerLevelsEventContent>(roomId).getOrThrow()
+        val levelToSendState = levels.stateDefault
+        val userLevel = levels.users[userId ?: matrixClient.userId] ?: levels.stateDefault
+        return userLevel >= levelToSendState
     }
 
     /**

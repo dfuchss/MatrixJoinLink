@@ -66,3 +66,16 @@ suspend inline fun <reified C : StateEventContent> MatrixBot.getStateEvent(
  * @return the matrix.to link
  */
 fun RoomId.matrixTo(): String = "https://matrix.to/#/${this.full}?via=${this.domain}"
+
+fun String.toInternalRoomIdOrNull(): RoomId? {
+    var cleanedInput = this.trim()
+    if (cleanedInput.startsWith("https://matrix.to/#/")) {
+        cleanedInput = cleanedInput.removePrefix("https://matrix.to/#/")
+        cleanedInput = cleanedInput.substringBefore("?")
+    }
+
+    if (cleanedInput.matches(Regex("^![a-zA-Z0-9]+:[a-zA-Z0-9.]+\$"))) {
+        return RoomId(cleanedInput)
+    }
+    return null
+}
