@@ -6,7 +6,7 @@ import org.fuchss.matrix.joinlink.MatrixBot
 
 internal class ChangeUsernameCommand : Command() {
     override val name: String = "name"
-    override val help: String = "{NEW_NAME} - sets the display name of the bot to NEW_NAME"
+    override val help: String = "{NEW_NAME} - sets the display name of the bot for this channel to NEW_NAME"
 
     /**
      * Change the username of the bot.
@@ -17,7 +17,7 @@ internal class ChangeUsernameCommand : Command() {
      */
     override suspend fun execute(matrixBot: MatrixBot, sender: UserId, roomId: RoomId, parameters: String) {
         if (parameters.isNotBlank()) {
-            matrixBot.rename(parameters)
+            matrixBot.renameInRoom(roomId, parameters)
         }
     }
 }
