@@ -44,7 +44,12 @@ private lateinit var commands: List<Command>
 fun main() {
     runBlocking {
         val config = Config.load()
-        commands = listOf(HelpCommand(config) { commands }, QuitCommand(), LogoutCommand(), ChangeUsernameCommand(), LinkCommand(config), UnlinkCommand(config))
+        commands = listOf(
+            HelpCommand(config) {
+                commands
+            },
+            QuitCommand(config), LogoutCommand(config), ChangeUsernameCommand(), LinkCommand(config), UnlinkCommand(config)
+        )
 
         val matrixClient = getMatrixClient(config)
 

@@ -6,15 +6,17 @@ import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.Membership
 import org.fuchss.matrix.joinlink.Config
 import org.fuchss.matrix.joinlink.MatrixBot
-import org.fuchss.matrix.joinlink.decrypt
 import org.fuchss.matrix.joinlink.events.JoinLinkEventContent
-import org.fuchss.matrix.joinlink.getStateEvent
+import org.fuchss.matrix.joinlink.events.RoomToJoinEventContent
+import org.fuchss.matrix.joinlink.helper.canInvite
+import org.fuchss.matrix.joinlink.helper.decrypt
 import org.fuchss.matrix.joinlink.matrixTo
 import org.fuchss.matrix.joinlink.toInternalRoomIdOrNull
 
 internal class UnlinkCommand(private val config: Config) : Command() {
     override val name: String = "unlink"
-    override val help: String = "[Optional Internal Link to Room] - remove all join links for the room"
+    override val params: String = "[Link/ID to TargetRoom]"
+    override val help: String = "remove all join links for the room"
 
     /**
      * Unlink a Matrix Join Link Room. If you provided an internal link to a room, the bot will use this room instead of the room the message was sent in.
@@ -29,9 +31,9 @@ internal class UnlinkCommand(private val config: Config) : Command() {
 
         logger.info("Requested Unlink for $targetRoom")
 
-        if (matrixBot.canInvite(targetRoom, sender)) {
+        if (!matrixBot.canInvite(targetRoom, sender)) {
             matrixBot.room().sendMessage(roomId) {
-                text("You are not allowed to invite users to this room (`${targetRoom.matrixTo()}`). Therefore, you cannot remove a join link.")
+                text("You are not allowed to invite users to this room (${targetRoom.matrixTo()}). Therefore, you cannot remove a join link.")
             }
             return
         }
@@ -43,6 +45,9 @@ internal class UnlinkCommand(private val config: Config) : Command() {
             return
         }
 
+        matrixBot.sendStateEvent(targetRoom, JoinLinkEventContent())
+        matrixBot.sendStateEvent(currentJoinLink, RoomToJoinEventContent())
+
         val usersOfRoom = matrixBot.rooms().getMembers(currentJoinLink).getOrThrow()
         for (user in usersOfRoom) {
             if (user.sender.full == matrixBot.self().full || user.content.membership != Membership.JOIN) {
@@ -51,9 +56,7 @@ internal class UnlinkCommand(private val config: Config) : Command() {
             matrixBot.rooms().banUser(currentJoinLink, user.sender, reason = "Matrix Join Link invalidated").getOrThrow()
         }
 
-        matrixBot.sendStateEvent(targetRoom, JoinLinkEventContent())
         matrixBot.rooms().leaveRoom(currentJoinLink, reason = "Matrix Join Link invalidated")
-
-        matrixBot.room().sendMessage(targetRoom) { text("Unlinked the Room") }
+        matrixBot.room().sendMessage(roomId) { text("Unlinked the Room") }
     }
 }

@@ -11,6 +11,7 @@ internal abstract class Command {
     protected val logger: Logger = LoggerFactory.getLogger(this::class.java)
 
     abstract val name: String
+    open val params: String = ""
     abstract val help: String
 
     /**

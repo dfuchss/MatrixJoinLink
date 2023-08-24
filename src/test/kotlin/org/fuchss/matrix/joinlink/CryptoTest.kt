@@ -1,6 +1,8 @@
 package org.fuchss.matrix.joinlink
 
 import net.folivo.trixnity.core.model.RoomId
+import org.fuchss.matrix.joinlink.helper.decrypt
+import org.fuchss.matrix.joinlink.helper.encrypt
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 

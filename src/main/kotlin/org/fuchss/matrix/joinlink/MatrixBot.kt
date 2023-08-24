@@ -17,13 +17,12 @@ import net.folivo.trixnity.clientserverapi.client.SyncState
 import net.folivo.trixnity.core.EventSubscriber
 import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
-import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.Event
 import net.folivo.trixnity.core.model.events.EventContent
 import net.folivo.trixnity.core.model.events.StateEventContent
 import net.folivo.trixnity.core.model.events.m.room.MemberEventContent
 import net.folivo.trixnity.core.model.events.m.room.Membership
-import net.folivo.trixnity.core.model.events.m.room.PowerLevelsEventContent
+import net.folivo.trixnity.core.serialization.events.fromClass
 import net.folivo.trixnity.core.subscribe
 import org.slf4j.LoggerFactory
 import kotlin.reflect.KClass
@@ -104,27 +103,17 @@ class MatrixBot(private val matrixClient: MatrixClient, private val config: Conf
     ): Result<EventId> = matrixClient.api.rooms.sendStateEvent(roomId, eventContent)
 
     /**
-     * Get the current permission level of the bot in a room
-     * @param[roomId] the id to the room
-     * @return the permission level of the bot
+     * Get a state event from a room
+     * @param[C] the type of the event [StateEventContent]
+     * @param[roomId] the room to get the event from
+     * @return the event
      */
-    suspend fun permissionLevel(roomId: RoomId): Int {
-        val levels = getStateEvent<PowerLevelsEventContent>(roomId).getOrThrow()
-        return levels.users[matrixClient.userId] ?: levels.usersDefault
-    }
-
-    suspend fun canInvite(roomId: RoomId, userId: UserId? = null): Boolean {
-        val levels = getStateEvent<PowerLevelsEventContent>(roomId).getOrThrow()
-        val levelToInvite = levels.invite
-        val userLevel = levels.users[userId ?: matrixClient.userId] ?: levels.usersDefault
-        return userLevel >= levelToInvite
-    }
-
-    suspend fun canSendStateEvents(roomId: RoomId, userId: UserId? = null): Boolean {
-        val levels = getStateEvent<PowerLevelsEventContent>(roomId).getOrThrow()
-        val levelToSendState = levels.stateDefault
-        val userLevel = levels.users[userId ?: matrixClient.userId] ?: levels.stateDefault
-        return userLevel >= levelToSendState
+    suspend inline fun <reified C : StateEventContent> getStateEvent(
+        roomId: RoomId
+    ): Result<C> {
+        val type = contentMappings().state.fromClass(C::class).type
+        @Suppress("UNCHECKED_CAST")
+        return getStateEvent(type, roomId) as Result<C>
     }
 
     /**
@@ -148,6 +137,16 @@ class MatrixBot(private val matrixClient: MatrixClient, private val config: Conf
      */
     fun <T : EventContent> subscribe(clazz: KClass<T>, subscriber: EventSubscriber<T>, listenNonUsers: Boolean = false) {
         matrixClient.api.sync.subscribe(clazz) { event -> if (isValidEventFromUser(event, listenNonUsers)) subscriber(event) }
+    }
+
+    /**
+     * Subscribe to a certain class of event. Note that you can only subscribe for events that are sent by an admin by default.
+     * @param[subscriber] the function to invoke for the events
+     * @param[listenNonUsers] whether you want to subscribe for events from non users
+     * @see MatrixBot.subscribe
+     */
+    inline fun <reified T : EventContent> subscribe(listenNonUsers: Boolean = false, noinline subscriber: EventSubscriber<T>) {
+        subscribe(T::class, subscriber, listenNonUsers)
     }
 
     /**

@@ -21,7 +21,7 @@ internal class HelpCommand(private val config: Config, private val commandGetter
         var helpMessage = "This is the JoinLink Bot. You can use the following commands:\n"
 
         for (command in commandGetter()) {
-            helpMessage += "\n* `!${config.prefix} ${command.name} - ${command.help}`"
+            helpMessage += "\n* `!${config.prefix} ${command.name} ${command.params} - ${command.help}`"
         }
 
         matrixBot.room().sendMessage(roomId) { markdown(helpMessage) }

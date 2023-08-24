@@ -12,13 +12,12 @@ import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.Event
 import net.folivo.trixnity.core.model.events.m.room.MemberEventContent
 import net.folivo.trixnity.core.model.events.m.room.Membership
-import org.fuchss.matrix.joinlink.ADMIN_POWER_LEVEL
 import org.fuchss.matrix.joinlink.Config
 import org.fuchss.matrix.joinlink.MatrixBot
-import org.fuchss.matrix.joinlink.decrypt
 import org.fuchss.matrix.joinlink.events.JoinLinkEventContent
 import org.fuchss.matrix.joinlink.events.RoomToJoinEventContent
-import org.fuchss.matrix.joinlink.getStateEvent
+import org.fuchss.matrix.joinlink.helper.decrypt
+import org.fuchss.matrix.joinlink.helper.isAdminInRoom
 import org.fuchss.matrix.joinlink.markdown
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -53,8 +52,7 @@ internal suspend fun handleJoinsToMatrixJoinLinkRooms(event: Event<*>, memberEve
         return
     }
 
-    val permissionOfBot = matrixBot.permissionLevel(roomId)
-    if (permissionOfBot < ADMIN_POWER_LEVEL) {
+    if (!matrixBot.self().isAdminInRoom(matrixBot, roomId)) {
         logger.debug("Skipping MemberEvent in {} because it's not a bot's room", roomId)
         return
     }

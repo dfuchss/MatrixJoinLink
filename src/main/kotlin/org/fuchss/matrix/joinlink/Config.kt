@@ -17,6 +17,7 @@ import java.io.File
  * @param[username] the username of the bot's account
  * @param[password] the password of the bot's account
  * @param[dataDirectory] the path to the databases and media folder
+ * @param[admins] the matrix ids of the admins. E.g. "@user:invalid.domain"
  * @param[users] the matrix ids of the authorized users or servers. E.g. "@user:invalid.domain" or ":invalid.domain"
  * @param[encryptionKey] a symmetric key that will be used to encrypt the event content for the bot
  */
@@ -26,6 +27,7 @@ data class Config(
     @JsonProperty val username: String,
     @JsonProperty val password: String,
     @JsonProperty val dataDirectory: String,
+    @JsonProperty val admins: List<String>,
     @JsonProperty val users: List<String>,
     @JsonProperty val encryptionKey: String
 ) {
@@ -44,13 +46,25 @@ data class Config(
 
             val config: Config = ObjectMapper().registerKotlinModule().registerModule(JavaTimeModule()).readValue(configFile)
             log.info("Loaded config ${configFile.absolutePath}")
-
-            if (config.baseUrl.isBlank() || config.username.isBlank() || config.password.isBlank() || config.encryptionKey.isBlank()) {
-                log.error("Please verify that baseUrl, username, password, and encryptionKey are not null!")
-                error("Config invalid. ")
-            }
-
+            config.validate()
             return config
+        }
+    }
+
+    private fun validate() {
+        if (baseUrl.isBlank() || username.isBlank() || password.isBlank() || encryptionKey.isBlank()) {
+            log.error("Please verify that baseUrl, username, password, and encryptionKey are not null!")
+            error("Config invalid.")
+        }
+
+        if (dataDirectory.isBlank()) {
+            log.error("Please verify that dataDirectory is not empty!")
+            error("Config invalid.")
+        }
+
+        if (admins.isEmpty()) {
+            log.error("No admins specified. This is not allowed. Please specify at least one admin.")
+            error("Config invalid.")
         }
     }
 

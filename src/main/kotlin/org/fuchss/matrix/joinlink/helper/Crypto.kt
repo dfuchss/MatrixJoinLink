@@ -1,6 +1,7 @@
-package org.fuchss.matrix.joinlink
+package org.fuchss.matrix.joinlink.helper
 
 import net.folivo.trixnity.core.model.RoomId
+import org.fuchss.matrix.joinlink.Config
 import org.slf4j.LoggerFactory
 import java.security.SecureRandom
 import java.security.spec.KeySpec

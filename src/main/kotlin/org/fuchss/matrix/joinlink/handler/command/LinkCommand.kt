@@ -7,20 +7,22 @@ import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.HistoryVisibilityEventContent
 import net.folivo.trixnity.core.model.events.m.room.PowerLevelsEventContent
-import org.fuchss.matrix.joinlink.ADMIN_POWER_LEVEL
 import org.fuchss.matrix.joinlink.Config
 import org.fuchss.matrix.joinlink.MatrixBot
-import org.fuchss.matrix.joinlink.decrypt
-import org.fuchss.matrix.joinlink.encrypt
 import org.fuchss.matrix.joinlink.events.JoinLinkEventContent
 import org.fuchss.matrix.joinlink.events.RoomToJoinEventContent
-import org.fuchss.matrix.joinlink.getStateEvent
+import org.fuchss.matrix.joinlink.helper.ADMIN_POWER_LEVEL
+import org.fuchss.matrix.joinlink.helper.canInvite
+import org.fuchss.matrix.joinlink.helper.canSendStateEvents
+import org.fuchss.matrix.joinlink.helper.decrypt
+import org.fuchss.matrix.joinlink.helper.encrypt
 import org.fuchss.matrix.joinlink.matrixTo
 import org.fuchss.matrix.joinlink.toInternalRoomIdOrNull
 
 internal class LinkCommand(private val config: Config) : Command() {
     override val name: String = "link"
-    override val help: String = "[Optional Internal Link to Room] {Readable Name of Link} - create a join link for the room"
+    override val params: String = "[Link/ID to TargetRoom] {Readable Name of Link}"
+    override val help: String = "create a join link for the room (if none provided, the room the message was sent in is used)"
 
     /**
      * Handle a link request. If the message originates from a user that is authorized, the bot tries to create a JoinLinkRoom (or uses an existing one).
@@ -43,27 +45,14 @@ internal class LinkCommand(private val config: Config) : Command() {
             return
         }
 
+        if (!hasPermissions(matrixBot, sender, roomId, targetRoom)) {
+            return
+        }
+
         val nameOfLink = if (providedRoomId != null) parameters.substringAfter(" ").trim() else parameters.trim()
 
         if (nameOfLink.isBlank()) {
             matrixBot.room().sendMessage(roomId) { text("Please provide a name for the link") }
-            return
-        }
-
-        val levels = matrixBot.getStateEvent<PowerLevelsEventContent>(targetRoom).getOrThrow()
-
-        if (!matrixBot.canInvite(targetRoom, sender)) {
-            matrixBot.room().sendMessage(roomId) { text("You are not allowed to invite users to this room (`${targetRoom.matrixTo()}`)") }
-            return
-        }
-
-        if (!matrixBot.canInvite(targetRoom)) {
-            matrixBot.room().sendMessage(roomId) { text("I am not allowed to invite users to this room (`${targetRoom.matrixTo()}`)") }
-            return
-        }
-
-        if (!matrixBot.canSendStateEvents(targetRoom)) {
-            matrixBot.room().sendMessage(roomId) { text("I am not allowed to send state events to this room (`${targetRoom.matrixTo()}`)") }
             return
         }
 
@@ -95,5 +84,27 @@ internal class LinkCommand(private val config: Config) : Command() {
         matrixBot.sendStateEvent(joinLink, roomsToJoinEvent)
 
         matrixBot.room().sendMessage(roomId) { text("Link to share the Room: ${joinLink.matrixTo()}") }
+    }
+
+    private suspend fun hasPermissions(matrixBot: MatrixBot, sender: UserId, roomId: RoomId, targetRoom: RoomId): Boolean {
+        if (!matrixBot.canInvite(targetRoom, sender)) {
+            logger.info("User ${sender.full} is not allowed to invite users to this room (`${targetRoom.matrixTo()}`)")
+            matrixBot.room().sendMessage(roomId) { text("You are not allowed to invite users to this room (`${targetRoom.matrixTo()}`)") }
+            return false
+        }
+
+        if (!matrixBot.canInvite(targetRoom)) {
+            logger.debug("I am not allowed to invite users to this room (`${targetRoom.matrixTo()}`)")
+            matrixBot.room().sendMessage(roomId) { text("I am not allowed to invite users to this room (`${targetRoom.matrixTo()}`)") }
+            return false
+        }
+
+        if (!matrixBot.canSendStateEvents(targetRoom)) {
+            logger.debug("I am not allowed to send state events to this room (`${targetRoom.matrixTo()}`)")
+            matrixBot.room().sendMessage(roomId) { text("I am not allowed to send state events to this room (`${targetRoom.matrixTo()}`)") }
+            return false
+        }
+
+        return true
     }
 }

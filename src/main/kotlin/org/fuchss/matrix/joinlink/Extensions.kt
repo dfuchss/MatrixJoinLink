@@ -5,17 +5,11 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withTimeoutOrNull
 import net.folivo.trixnity.client.room.message.MessageBuilder
 import net.folivo.trixnity.client.room.message.text
-import net.folivo.trixnity.core.EventSubscriber
 import net.folivo.trixnity.core.model.RoomId
-import net.folivo.trixnity.core.model.events.EventContent
-import net.folivo.trixnity.core.model.events.StateEventContent
-import net.folivo.trixnity.core.serialization.events.fromClass
 import org.commonmark.parser.Parser
 import org.commonmark.renderer.html.HtmlRenderer
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-
-internal const val ADMIN_POWER_LEVEL = 100
 
 /**
  * Same as [Flow.first] but with a defined timeout that leads to null if reached.
@@ -38,35 +32,15 @@ fun MessageBuilder.markdown(markdown: String) {
 }
 
 /**
- * Subscribe to a certain class of event. Note that you can only subscribe for events that are sent by an admin by default.
- * @param[subscriber] the function to invoke for the events
- * @param[listenNonUsers] whether you want to subscribe for events from non users
- * @see MatrixBot.subscribe
- */
-inline fun <reified T : EventContent> MatrixBot.subscribe(listenNonUsers: Boolean = false, noinline subscriber: EventSubscriber<T>) {
-    subscribe(T::class, subscriber, listenNonUsers)
-}
-
-/**
- * Get a state event from a room
- * @param[C] the type of the event [StateEventContent]
- * @param[roomId] the room to get the event from
- * @return the event
- */
-suspend inline fun <reified C : StateEventContent> MatrixBot.getStateEvent(
-    roomId: RoomId
-): Result<C> {
-    val type = contentMappings().state.fromClass(C::class).type
-    @Suppress("UNCHECKED_CAST")
-    return getStateEvent(type, roomId) as Result<C>
-}
-
-/**
  * Create a matrix.to link from a RoomId
  * @return the matrix.to link
  */
 fun RoomId.matrixTo(): String = "https://matrix.to/#/${this.full}?via=${this.domain}"
 
+/**
+ * Extract a RoomId from a string. The string can be a matrix.to link or a room id.
+ * @return the RoomId or null if the string is not a valid room id
+ */
 fun String.toInternalRoomIdOrNull(): RoomId? {
     var cleanedInput = this.trim()
     if (cleanedInput.startsWith("https://matrix.to/#/")) {

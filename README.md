@@ -3,8 +3,7 @@
 This bot allows the creation of join links to non-public rooms in matrix. It uses the [Trixnity](https://trixnity.gitlab.io/trixnity/) framework.
 The bot is currently in early alpha and primarily used as proof-of-concept.
 
-:warning: **No liability of any kind is assumed. This project is in alpha. It is possible that all implemented mechanisms can change.**
-Nevertheless, I am of course interested in feedback. Feel free to use the matrix chat (see below).
+:info: This project is in alpha. Feel free to use the matrix chat (see below).
 
 ## Reason for this Bot
 
@@ -18,7 +17,8 @@ can invite _JoinLink_ and create an invite link. This link can be shared to my f
     * Copy `config-sample.json` to `config.json`
     * Enter `baseUrl` to the matrix server and `username` / `password` for the bot user
     * Set an encryption key. The bot will use this string as key to encrypt the state events.
-    * Add yourself (e.g., `@user:matrix.org`) or your homeserver (e.g., `:matrix.org`) to the `users` (empty list == allow all)
+    * Add yourself (e.g., `@user:matrix.org`) or your homeserver (e.g., `:matrix.org`) to the `users` (empty == allow all). Users can interact with the bot.
+    * Add yourself to the `admins` (can't be empty)
 3. Either run the bot via jar or run it via the provided docker.
     * If you run it locally, you can use the environment variable `CONFIG_PATH` to point at your `config.json` (defaults to `./config.json`)
     * If you run it in docker, you can use a command similar to
