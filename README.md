@@ -3,7 +3,7 @@
 This bot allows the creation of join links to non-public rooms in matrix. It uses the [Trixnity](https://trixnity.gitlab.io/trixnity/) framework.
 The bot is currently in early alpha and primarily used as proof-of-concept.
 
-:info: This project is in alpha. Feel free to use the matrix chat (see below).
+🔨 This project is in alpha. Feel free to use the matrix chat (see below). 🔨
 
 ## Reason for this Bot
 
