@@ -6,8 +6,7 @@
     "password": "",
     "encryptionKey": "",
     "admins": [
-        "@user:invalid-server.invalid-domain",
-        ":invalid-server.invalid-domain"
+        "@admin:invalid-server.invalid-domain"
     ],
     "users": [
         ":invalid-server.invalid-domain",
