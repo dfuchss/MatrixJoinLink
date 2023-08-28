@@ -11,6 +11,7 @@ import org.fuchss.matrix.joinlink.events.RoomToJoinEventContent
 import org.fuchss.matrix.joinlink.helper.canInvite
 import org.fuchss.matrix.joinlink.helper.decrypt
 import org.fuchss.matrix.joinlink.matrixTo
+import org.fuchss.matrix.joinlink.syntaxOfRoomId
 import org.fuchss.matrix.joinlink.toInternalRoomIdOrNull
 
 internal class UnlinkCommand(private val config: Config) : Command() {
@@ -26,7 +27,14 @@ internal class UnlinkCommand(private val config: Config) : Command() {
      * @param[parameters] The parameters of the command.
      */
     override suspend fun execute(matrixBot: MatrixBot, sender: UserId, roomId: RoomId, parameters: String) {
-        val providedRoomId = parameters.trim().toInternalRoomIdOrNull()
+        val possibleTargetRoomId = parameters.trim()
+        val providedRoomId = possibleTargetRoomId.toInternalRoomIdOrNull(matrixBot)
+        if (providedRoomId == null && possibleTargetRoomId.syntaxOfRoomId()) {
+            logger.warn("Provided RoomId {} is not valid", possibleTargetRoomId)
+            matrixBot.room().sendMessage(roomId) { text("Provided RoomId ($possibleTargetRoomId) is not valid") }
+            return
+        }
+
         val targetRoom = providedRoomId ?: roomId
 
         logger.info("Requested Unlink for $targetRoom")

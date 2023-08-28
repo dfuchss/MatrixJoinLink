@@ -17,6 +17,7 @@ import org.fuchss.matrix.joinlink.helper.canSendStateEvents
 import org.fuchss.matrix.joinlink.helper.decrypt
 import org.fuchss.matrix.joinlink.helper.encrypt
 import org.fuchss.matrix.joinlink.matrixTo
+import org.fuchss.matrix.joinlink.syntaxOfRoomId
 import org.fuchss.matrix.joinlink.toInternalRoomIdOrNull
 
 internal class LinkCommand(private val config: Config) : Command() {
@@ -33,7 +34,15 @@ internal class LinkCommand(private val config: Config) : Command() {
      * @param[parameters] The parameters of the link request.
      */
     override suspend fun execute(matrixBot: MatrixBot, sender: UserId, roomId: RoomId, parameters: String) {
-        val providedRoomId = parameters.split(" ").first().toInternalRoomIdOrNull()
+        val possibleTargetRoomId = parameters.split(" ").first()
+        val providedRoomId = possibleTargetRoomId.toInternalRoomIdOrNull(matrixBot)
+
+        if (providedRoomId == null && possibleTargetRoomId.syntaxOfRoomId()) {
+            logger.warn("Provided RoomId {} is not valid", possibleTargetRoomId)
+            matrixBot.room().sendMessage(roomId) { text("Provided RoomId ($possibleTargetRoomId) is not valid") }
+            return
+        }
+
         val targetRoom = providedRoomId ?: roomId
 
         logger.info("Requested Link for $targetRoom")
@@ -41,7 +50,7 @@ internal class LinkCommand(private val config: Config) : Command() {
         val currentJoinLink = matrixBot.getStateEvent<JoinLinkEventContent>(targetRoom).getOrNull()?.joinlinkRoom.decrypt(config)
 
         if (currentJoinLink != null) {
-            matrixBot.room().sendMessage(roomId) { text("Link to share the Room (`${targetRoom.matrixTo()}`): ${currentJoinLink.matrixTo()}") }
+            matrixBot.room().sendMessage(roomId) { text("Link to share the Room (${targetRoom.matrixTo()}): ${currentJoinLink.matrixTo()}") }
             return
         }
 
@@ -88,20 +97,20 @@ internal class LinkCommand(private val config: Config) : Command() {
 
     private suspend fun hasPermissions(matrixBot: MatrixBot, sender: UserId, roomId: RoomId, targetRoom: RoomId): Boolean {
         if (!matrixBot.canInvite(targetRoom, sender)) {
-            logger.info("User ${sender.full} is not allowed to invite users to this room (`${targetRoom.matrixTo()}`)")
-            matrixBot.room().sendMessage(roomId) { text("You are not allowed to invite users to this room (`${targetRoom.matrixTo()}`)") }
+            logger.info("User ${sender.full} is not allowed to invite users to this room (${targetRoom.matrixTo()})")
+            matrixBot.room().sendMessage(roomId) { text("You are not allowed to invite users to this room (${targetRoom.matrixTo()})") }
             return false
         }
 
         if (!matrixBot.canInvite(targetRoom)) {
-            logger.debug("I am not allowed to invite users to this room (`${targetRoom.matrixTo()}`)")
-            matrixBot.room().sendMessage(roomId) { text("I am not allowed to invite users to this room (`${targetRoom.matrixTo()}`)") }
+            logger.debug("I am not allowed to invite users to this room (${targetRoom.matrixTo()})")
+            matrixBot.room().sendMessage(roomId) { text("I am not allowed to invite users to this room (${targetRoom.matrixTo()})") }
             return false
         }
 
         if (!matrixBot.canSendStateEvents(targetRoom)) {
-            logger.debug("I am not allowed to send state events to this room (`${targetRoom.matrixTo()}`)")
-            matrixBot.room().sendMessage(roomId) { text("I am not allowed to send state events to this room (`${targetRoom.matrixTo()}`)") }
+            logger.debug("I am not allowed to send state events to this room (${targetRoom.matrixTo()})")
+            matrixBot.room().sendMessage(roomId) { text("I am not allowed to send state events to this room (${targetRoom.matrixTo()})") }
             return false
         }
 
