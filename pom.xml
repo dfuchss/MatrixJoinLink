@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.fuchss</groupId>
         <artifactId>maven-parent</artifactId>
-        <version>0.3.0</version>
+        <version>0.4.1</version>
     </parent>
 
     <groupId>org.fuchss.matrix</groupId>
@@ -33,7 +33,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <trixnity.version>3.10.2</trixnity.version>
+        <trixnity.version>3.10.3</trixnity.version>
         <serialization.version>1.6.0</serialization.version>
         <main.class>org.fuchss.matrix.joinlink.MainKt</main.class>
     </properties>
