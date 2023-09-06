@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import net.folivo.trixnity.core.model.UserId
+import org.fuchss.matrix.bots.IConfig
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -22,15 +22,15 @@ import java.io.File
  * @param[encryptionKey] a symmetric key that will be used to encrypt the event content for the bot
  */
 data class Config(
-    @JsonProperty val prefix: String = "join",
-    @JsonProperty val baseUrl: String,
-    @JsonProperty val username: String,
-    @JsonProperty val password: String,
-    @JsonProperty val dataDirectory: String,
-    @JsonProperty val admins: List<String>,
-    @JsonProperty val users: List<String>,
+    @JsonProperty override val prefix: String = "join",
+    @JsonProperty override val baseUrl: String,
+    @JsonProperty override val username: String,
+    @JsonProperty override val password: String,
+    @JsonProperty override val dataDirectory: String,
+    @JsonProperty override val admins: List<String>,
+    @JsonProperty override val users: List<String>,
     @JsonProperty val encryptionKey: String
-) {
+) : IConfig {
     companion object {
         private val log: Logger = LoggerFactory.getLogger(Config::class.java)
 
@@ -51,35 +51,10 @@ data class Config(
         }
     }
 
-    private fun validate() {
-        if (baseUrl.isBlank() || username.isBlank() || password.isBlank() || encryptionKey.isBlank()) {
-            log.error("Please verify that baseUrl, username, password, and encryptionKey are not null!")
-            error("Config invalid.")
+    override fun validate() {
+        super.validate()
+        if (encryptionKey.isBlank()) {
+            error("Please verify that encryptionKey is not null!")
         }
-
-        if (dataDirectory.isBlank()) {
-            log.error("Please verify that dataDirectory is not empty!")
-            error("Config invalid.")
-        }
-
-        if (admins.isEmpty()) {
-            log.error("No admins specified. This is not allowed. Please specify at least one admin.")
-            error("Config invalid.")
-        }
-    }
-
-    /**
-     * Determine whether a user id belongs to an authorized user.
-     * @param[user] the user id to check
-     * @return indicator for authorization
-     */
-    fun isUser(user: UserId?): Boolean {
-        if (user == null) {
-            return false
-        }
-        if (users.isEmpty()) {
-            return true
-        }
-        return users.any { user.full.endsWith(it) }
     }
 }

@@ -2,23 +2,23 @@ package org.fuchss.matrix.joinlink.handler
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import net.folivo.trixnity.client.getEventId
-import net.folivo.trixnity.client.getOriginTimestamp
-import net.folivo.trixnity.client.getRoomId
-import net.folivo.trixnity.client.getSender
 import net.folivo.trixnity.client.room.message.text
 import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.Event
+import net.folivo.trixnity.core.model.events.eventIdOrNull
 import net.folivo.trixnity.core.model.events.m.room.MemberEventContent
 import net.folivo.trixnity.core.model.events.m.room.Membership
+import net.folivo.trixnity.core.model.events.originTimestampOrNull
+import net.folivo.trixnity.core.model.events.roomIdOrNull
+import net.folivo.trixnity.core.model.events.senderOrNull
+import org.fuchss.matrix.bots.MatrixBot
+import org.fuchss.matrix.bots.helper.isAdminInRoom
+import org.fuchss.matrix.bots.markdown
 import org.fuchss.matrix.joinlink.Config
-import org.fuchss.matrix.joinlink.MatrixBot
 import org.fuchss.matrix.joinlink.events.JoinLinkEventContent
 import org.fuchss.matrix.joinlink.events.RoomToJoinEventContent
 import org.fuchss.matrix.joinlink.helper.decrypt
-import org.fuchss.matrix.joinlink.helper.isAdminInRoom
-import org.fuchss.matrix.joinlink.markdown
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
@@ -40,8 +40,8 @@ private val logger: Logger = LoggerFactory.getLogger(MatrixBot::class.java)
  * @param[config] The config to use.
  */
 internal suspend fun handleJoinsToMatrixJoinLinkRooms(event: Event<*>, memberEventContent: MemberEventContent, matrixBot: MatrixBot, config: Config) {
-    val roomId = event.getRoomId()
-    val userId = event.getSender()
+    val roomId = event.roomIdOrNull
+    val userId = event.senderOrNull
 
     if (roomId == null || userId == null) {
         return
@@ -63,8 +63,8 @@ internal suspend fun handleJoinsToMatrixJoinLinkRooms(event: Event<*>, memberEve
         now - Instant.fromEpochMilliseconds(it.value) > 20.seconds
     }.forEach { recentHandledJoinEventIdToTimestamp.remove(it.key) }
 
-    val eventId = event.getEventId()?.full ?: "$roomId-$userId"
-    val originTimestamp = event.getOriginTimestamp() ?: now.toEpochMilliseconds()
+    val eventId = event.eventIdOrNull?.full ?: "$roomId-$userId"
+    val originTimestamp = event.originTimestampOrNull ?: now.toEpochMilliseconds()
 
     try {
         acquireUserLock(userId)

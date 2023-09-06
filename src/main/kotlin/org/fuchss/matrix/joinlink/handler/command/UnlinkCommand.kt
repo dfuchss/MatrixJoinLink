@@ -4,15 +4,16 @@ import net.folivo.trixnity.client.room.message.text
 import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.Membership
+import org.fuchss.matrix.bots.MatrixBot
+import org.fuchss.matrix.bots.command.Command
+import org.fuchss.matrix.bots.helper.canInvite
+import org.fuchss.matrix.bots.matrixTo
+import org.fuchss.matrix.bots.syntaxOfRoomId
+import org.fuchss.matrix.bots.toInternalRoomIdOrNull
 import org.fuchss.matrix.joinlink.Config
-import org.fuchss.matrix.joinlink.MatrixBot
 import org.fuchss.matrix.joinlink.events.JoinLinkEventContent
 import org.fuchss.matrix.joinlink.events.RoomToJoinEventContent
-import org.fuchss.matrix.joinlink.helper.canInvite
 import org.fuchss.matrix.joinlink.helper.decrypt
-import org.fuchss.matrix.joinlink.matrixTo
-import org.fuchss.matrix.joinlink.syntaxOfRoomId
-import org.fuchss.matrix.joinlink.toInternalRoomIdOrNull
 
 internal class UnlinkCommand(private val config: Config) : Command() {
     override val name: String = "unlink"
