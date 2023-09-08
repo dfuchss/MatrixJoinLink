@@ -22,7 +22,7 @@ can invite _JoinLink_ and create an invite link. This link can be shared to my f
 3. Either run the bot via jar or run it via the provided docker.
     * If you run it locally, you can use the environment variable `CONFIG_PATH` to point at your `config.json` (defaults to `./config.json`)
     * If you run it in docker, you can use a command similar to
-      this `docker run -itd -v $LOCAL_PATH_TO_CONFIG:/usr/src/bot/data/config.json:ro -v $LOCAL_PAT ghcr.io/dfuchss/matrixjoinlink`
+      this `docker run -itd -v $LOCAL_PATH_TO_CONFIG:/usr/src/bot/data/config.json:ro ghcr.io/dfuchss/matrixjoinlink`
     * If you want to persist sessions, you should persist the data volume `-v $LOCAL_PATH_TO_DATA:/usr/src/bot/data`
 
 ## Usage
