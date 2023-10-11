@@ -26,7 +26,10 @@ fun RoomId.encrypt(config: Config): String = encryptRoomId(config, this)
 private val random = SecureRandom()
 
 @OptIn(ExperimentalEncodingApi::class)
-private fun encryptRoomId(config: Config, roomId: RoomId): String {
+private fun encryptRoomId(
+    config: Config,
+    roomId: RoomId
+): String {
     val salt = ByteArray(16)
     random.nextBytes(salt)
 
@@ -51,7 +54,10 @@ private fun encryptRoomId(config: Config, roomId: RoomId): String {
 fun String?.decrypt(config: Config): RoomId? = decryptRoomId(config, this)
 
 @OptIn(ExperimentalEncodingApi::class)
-private fun decryptRoomId(config: Config, content: String?): RoomId? {
+private fun decryptRoomId(
+    config: Config,
+    content: String?
+): RoomId? {
     if (content == null) return null
 
     return try {

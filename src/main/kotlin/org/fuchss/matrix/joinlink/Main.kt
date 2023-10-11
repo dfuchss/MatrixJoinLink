@@ -35,12 +35,13 @@ private lateinit var commands: List<Command>
 fun main() {
     runBlocking {
         val config = Config.load()
-        commands = listOf(
-            HelpCommand(config) {
-                commands
-            },
-            QuitCommand(config), LogoutCommand(config), ChangeUsernameCommand(), LinkCommand(config), UnlinkCommand(config)
-        )
+        commands =
+            listOf(
+                HelpCommand(config) {
+                    commands
+                },
+                QuitCommand(config), LogoutCommand(config), ChangeUsernameCommand(), LinkCommand(config), UnlinkCommand(config)
+            )
 
         val matrixClient = getMatrixClient(config)
 
@@ -59,23 +60,25 @@ fun main() {
 }
 
 private suspend fun getMatrixClient(config: Config): MatrixClient {
-    val existingMatrixClient = MatrixClient.fromStore(createRepositoriesModule(config), createMediaStore(config)) {
-        modules = createDefaultModules() + joinLinkModule
-    }.getOrThrow()
+    val existingMatrixClient =
+        MatrixClient.fromStore(createRepositoriesModule(config), createMediaStore(config)) {
+            modules = createDefaultModules() + joinLinkModule
+        }.getOrThrow()
     if (existingMatrixClient != null) {
         return existingMatrixClient
     }
 
-    val matrixClient = MatrixClient.login(
-        baseUrl = Url(config.baseUrl),
-        identifier = IdentifierType.User(config.username),
-        password = config.password,
-        repositoriesModule = createRepositoriesModule(config),
-        mediaStore = createMediaStore(config),
-        initialDeviceDisplayName = "${MatrixBot::class.java.`package`.name}-${Random.Default.nextInt()}"
-    ) {
-        modules = createDefaultModules() + joinLinkModule
-    }.getOrThrow()
+    val matrixClient =
+        MatrixClient.login(
+            baseUrl = Url(config.baseUrl),
+            identifier = IdentifierType.User(config.username),
+            password = config.password,
+            repositoriesModule = createRepositoriesModule(config),
+            mediaStore = createMediaStore(config),
+            initialDeviceDisplayName = "${MatrixBot::class.java.`package`.name}-${Random.Default.nextInt()}"
+        ) {
+            modules = createDefaultModules() + joinLinkModule
+        }.getOrThrow()
 
     return matrixClient
 }

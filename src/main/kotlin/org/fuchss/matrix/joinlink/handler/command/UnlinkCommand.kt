@@ -27,7 +27,12 @@ internal class UnlinkCommand(private val config: Config) : Command() {
      * @param[roomId] The roomId of the unlink request.
      * @param[parameters] The parameters of the command.
      */
-    override suspend fun execute(matrixBot: MatrixBot, sender: UserId, roomId: RoomId, parameters: String) {
+    override suspend fun execute(
+        matrixBot: MatrixBot,
+        sender: UserId,
+        roomId: RoomId,
+        parameters: String
+    ) {
         val possibleTargetRoomId = parameters.trim()
         val providedRoomId = possibleTargetRoomId.toInternalRoomIdOrNull(matrixBot)
         if (providedRoomId == null && possibleTargetRoomId.syntaxOfRoomId()) {

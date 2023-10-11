@@ -34,7 +34,12 @@ internal class LinkCommand(private val config: Config) : Command() {
      * @param[roomId] The roomId of the link request.
      * @param[parameters] The parameters of the link request.
      */
-    override suspend fun execute(matrixBot: MatrixBot, sender: UserId, roomId: RoomId, parameters: String) {
+    override suspend fun execute(
+        matrixBot: MatrixBot,
+        sender: UserId,
+        roomId: RoomId,
+        parameters: String
+    ) {
         val possibleTargetRoomId = parameters.split(" ").first()
         val providedRoomId = possibleTargetRoomId.toInternalRoomIdOrNull(matrixBot)
 
@@ -67,21 +72,24 @@ internal class LinkCommand(private val config: Config) : Command() {
         }
 
         // Create Join Room
-        val joinLink = matrixBot.rooms().createRoom(
-            visibility = DirectoryVisibility.PRIVATE,
-            name = "Matrix Join Link '$nameOfLink'",
-            topic = "This is the Matrix Join Link Room called '$nameOfLink'. You can leave the room :)",
-            preset = CreateRoom.Request.Preset.PUBLIC,
-            powerLevelContentOverride = PowerLevelsEventContent(
-                users = mapOf(matrixBot.self() to ADMIN_POWER_LEVEL),
-                events = mapOf(
-                    RoomToJoinEventContent.ID to ADMIN_POWER_LEVEL,
-                    JoinLinkEventContent.ID to ADMIN_POWER_LEVEL
-                ),
-                eventsDefault = ADMIN_POWER_LEVEL,
-                stateDefault = ADMIN_POWER_LEVEL
-            )
-        ).getOrThrow()
+        val joinLink =
+            matrixBot.rooms().createRoom(
+                visibility = DirectoryVisibility.PRIVATE,
+                name = "Matrix Join Link '$nameOfLink'",
+                topic = "This is the Matrix Join Link Room called '$nameOfLink'. You can leave the room :)",
+                preset = CreateRoom.Request.Preset.PUBLIC,
+                powerLevelContentOverride =
+                    PowerLevelsEventContent(
+                        users = mapOf(matrixBot.self() to ADMIN_POWER_LEVEL),
+                        events =
+                            mapOf(
+                                RoomToJoinEventContent.ID to ADMIN_POWER_LEVEL,
+                                JoinLinkEventContent.ID to ADMIN_POWER_LEVEL
+                            ),
+                        eventsDefault = ADMIN_POWER_LEVEL,
+                        stateDefault = ADMIN_POWER_LEVEL
+                    )
+            ).getOrThrow()
 
         // Set History Visibility to Joined to prevent others from seeing too much history
         matrixBot.rooms().sendStateEvent(joinLink, HistoryVisibilityEventContent(HistoryVisibilityEventContent.HistoryVisibility.JOINED)).getOrThrow()
@@ -96,7 +104,12 @@ internal class LinkCommand(private val config: Config) : Command() {
         matrixBot.room().sendMessage(roomId) { text("Link to share the Room: ${joinLink.matrixTo()}") }
     }
 
-    private suspend fun hasPermissions(matrixBot: MatrixBot, sender: UserId, roomId: RoomId, targetRoom: RoomId): Boolean {
+    private suspend fun hasPermissions(
+        matrixBot: MatrixBot,
+        sender: UserId,
+        roomId: RoomId,
+        targetRoom: RoomId
+    ): Boolean {
         if (!matrixBot.canInvite(targetRoom, sender)) {
             logger.info("User ${sender.full} is not allowed to invite users to this room (${targetRoom.matrixTo()})")
             matrixBot.room().sendMessage(roomId) { text("You are not allowed to invite users to this room (${targetRoom.matrixTo()})") }

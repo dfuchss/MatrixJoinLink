@@ -8,18 +8,21 @@ import net.folivo.trixnity.core.serialization.events.SerializerMapping
 import net.folivo.trixnity.core.serialization.events.SerializerMapping.Companion.of
 import org.koin.dsl.module
 
-private val joinLinkSerializationMapping = object : BaseEventContentSerializerMappings() {
-    override val state: Set<SerializerMapping<out StateEventContent>> = setOf(
-        of<JoinLinkEventContent>(JoinLinkEventContent.ID.name),
-        of<RoomToJoinEventContent>(RoomToJoinEventContent.ID.name)
-    )
-}
+private val joinLinkSerializationMapping =
+    object : BaseEventContentSerializerMappings() {
+        override val state: Set<SerializerMapping<out StateEventContent>> =
+            setOf(
+                of<JoinLinkEventContent>(JoinLinkEventContent.ID.name),
+                of<RoomToJoinEventContent>(RoomToJoinEventContent.ID.name)
+            )
+    }
 
 /**
  * Koin module for the joinlink events.
  */
-val joinLinkModule = module {
-    single<EventContentSerializerMappings> {
-        DefaultEventContentSerializerMappings + joinLinkSerializationMapping
+val joinLinkModule =
+    module {
+        single<EventContentSerializerMappings> {
+            DefaultEventContentSerializerMappings + joinLinkSerializationMapping
+        }
     }
-}

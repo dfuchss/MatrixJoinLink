@@ -39,7 +39,12 @@ private val logger: Logger = LoggerFactory.getLogger(MatrixBot::class.java)
  * @param[matrixBot] The bot to handle the MemberEvent.
  * @param[config] The config to use.
  */
-internal suspend fun handleJoinsToMatrixJoinLinkRooms(event: Event<*>, memberEventContent: MemberEventContent, matrixBot: MatrixBot, config: Config) {
+internal suspend fun handleJoinsToMatrixJoinLinkRooms(
+    event: Event<*>,
+    memberEventContent: MemberEventContent,
+    matrixBot: MatrixBot,
+    config: Config
+) {
     val roomId = event.roomIdOrNull
     val userId = event.senderOrNull
 
@@ -83,7 +88,14 @@ internal suspend fun handleJoinsToMatrixJoinLinkRooms(event: Event<*>, memberEve
  * @param[matrixBot] The bot to handle the MemberEvent.
  * @param[config] The config to use.
  */
-private suspend fun handleValidJoinEvent(eventId: String, originTimestamp: Long, roomId: RoomId, userId: UserId, matrixBot: MatrixBot, config: Config) {
+private suspend fun handleValidJoinEvent(
+    eventId: String,
+    originTimestamp: Long,
+    roomId: RoomId,
+    userId: UserId,
+    matrixBot: MatrixBot,
+    config: Config
+) {
     val roomToJoinState = matrixBot.getStateEvent<RoomToJoinEventContent>(roomId).getOrNull() ?: return
     if (roomToJoinState.roomToJoin.isNullOrEmpty()) {
         return
@@ -96,9 +108,10 @@ private suspend fun handleValidJoinEvent(eventId: String, originTimestamp: Long,
 
     logger.info("Inviting $userId to rooms because of JoinEvent to $roomId")
 
-    val welcomeMessage = "" +
-        "You've reached a MatrixJoinRoom. I'll invite you to the rooms ..\n" +
-        "You can leave the room now :)"
+    val welcomeMessage =
+        "" +
+            "You've reached a MatrixJoinRoom. I'll invite you to the rooms ..\n" +
+            "You can leave the room now :)"
 
     matrixBot.room().sendMessage(roomId) { text(welcomeMessage) }
 
@@ -140,4 +153,5 @@ private fun acquireUserLock(userId: UserId) {
     }
     lock.acquireUninterruptibly()
 }
+
 private fun releaseUserLock(userId: UserId) = userIdLocks[userId]?.release()
