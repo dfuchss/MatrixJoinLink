@@ -5,7 +5,7 @@ COPY src src
 COPY pom.xml pom.xml
 RUN mvn clean package
 
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:21-jre
 
 ENV RUN_IN_DOCKER true
 ENV TZ=Europe/Berlin
