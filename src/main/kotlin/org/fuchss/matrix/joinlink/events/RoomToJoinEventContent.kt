@@ -11,7 +11,8 @@ import net.folivo.trixnity.core.model.events.StateEventContent
  */
 @Serializable
 data class RoomToJoinEventContent(
-    @SerialName("room_to_join") val roomToJoin: String? = null
+    @SerialName("room_to_join") val roomToJoin: String? = null,
+    @SerialName("external_url") override val externalUrl: String? = null
 ) : StateEventContent {
     companion object {
         val ID = EventType(RoomToJoinEventContent::class, "org.fuchss.matrix.room_to_join")

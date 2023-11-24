@@ -5,8 +5,8 @@ import kotlinx.datetime.Instant
 import net.folivo.trixnity.client.room.message.text
 import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
-import net.folivo.trixnity.core.model.events.Event
-import net.folivo.trixnity.core.model.events.eventIdOrNull
+import net.folivo.trixnity.core.model.events.ClientEvent
+import net.folivo.trixnity.core.model.events.idOrNull
 import net.folivo.trixnity.core.model.events.m.room.MemberEventContent
 import net.folivo.trixnity.core.model.events.m.room.Membership
 import net.folivo.trixnity.core.model.events.originTimestampOrNull
@@ -40,7 +40,7 @@ private val logger: Logger = LoggerFactory.getLogger(MatrixBot::class.java)
  * @param[config] The config to use.
  */
 internal suspend fun handleJoinsToMatrixJoinLinkRooms(
-    event: Event<*>,
+    event: ClientEvent<*>,
     memberEventContent: MemberEventContent,
     matrixBot: MatrixBot,
     config: Config
@@ -68,7 +68,7 @@ internal suspend fun handleJoinsToMatrixJoinLinkRooms(
         now - Instant.fromEpochMilliseconds(it.value) > 20.seconds
     }.forEach { recentHandledJoinEventIdToTimestamp.remove(it.key) }
 
-    val eventId = event.eventIdOrNull?.full ?: "$roomId-$userId"
+    val eventId = event.idOrNull?.full ?: "$roomId-$userId"
     val originTimestamp = event.originTimestampOrNull ?: now.toEpochMilliseconds()
 
     try {
@@ -129,12 +129,12 @@ private suspend fun handleValidJoinEvent(
     }
 
     try {
-        val joinedMembers = matrixBot.rooms().getJoinedMembers(roomToJoin).getOrNull() ?: return
+        val joinedMembers = matrixBot.roomApi().getJoinedMembers(roomToJoin).getOrNull() ?: return
         if (joinedMembers.joined.containsKey(userId)) {
             logger.debug("Skipping MemberEvent {} for user {} in {} because the user is already in the room", eventId, userId, roomId)
             return
         }
-        matrixBot.rooms().inviteUser(roomToJoin, userId, reason = "Join via MatrixJoinLink").getOrThrow()
+        matrixBot.roomApi().inviteUser(roomToJoin, userId, reason = "Join via MatrixJoinLink").getOrThrow()
     } catch (e: Exception) {
         logger.error(e.message, e)
         matrixBot.room().sendMessage(roomToJoin) { markdown("**I could not invite $userId to the room. Please invite them manually.**") }

@@ -73,7 +73,7 @@ internal class LinkCommand(private val config: Config) : Command() {
 
         // Create Join Room
         val joinLink =
-            matrixBot.rooms().createRoom(
+            matrixBot.roomApi().createRoom(
                 visibility = DirectoryVisibility.PRIVATE,
                 name = "Matrix Join Link '$nameOfLink'",
                 topic = "This is the Matrix Join Link Room called '$nameOfLink'. You can leave the room :)",
@@ -92,7 +92,7 @@ internal class LinkCommand(private val config: Config) : Command() {
             ).getOrThrow()
 
         // Set History Visibility to Joined to prevent others from seeing too much history
-        matrixBot.rooms().sendStateEvent(joinLink, HistoryVisibilityEventContent(HistoryVisibilityEventContent.HistoryVisibility.JOINED)).getOrThrow()
+        matrixBot.roomApi().sendStateEvent(joinLink, HistoryVisibilityEventContent(HistoryVisibilityEventContent.HistoryVisibility.JOINED)).getOrThrow()
 
         logger.info("Create Room $joinLink for $targetRoom")
         val joinLinkEvent = JoinLinkEventContent(joinLink.encrypt(config))

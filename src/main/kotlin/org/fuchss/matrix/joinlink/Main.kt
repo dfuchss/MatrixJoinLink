@@ -37,7 +37,7 @@ fun main() {
         val config = Config.load()
         commands =
             listOf(
-                HelpCommand(config) {
+                HelpCommand(config, "JoinLink") {
                     commands
                 },
                 QuitCommand(config), LogoutCommand(config), ChangeUsernameCommand(), LinkCommand(config), UnlinkCommand(config)
@@ -46,9 +46,9 @@ fun main() {
         val matrixClient = getMatrixClient(config)
 
         val matrixBot = MatrixBot(matrixClient, config)
-        matrixBot.subscribe { event -> handleTextMessage(commands, event.roomIdOrNull, event.senderOrNull, event.content, matrixBot, config) }
-        matrixBot.subscribe { event -> handleEncryptedTextMessage(commands, event, matrixClient, matrixBot, config) }
-        matrixBot.subscribe<MemberEventContent> { event -> handleJoinsToMatrixJoinLinkRooms(event, event.content, matrixBot, config) }
+        matrixBot.subscribeContent { event -> handleTextMessage(commands, event.roomIdOrNull, event.senderOrNull, event.content, matrixBot, config) }
+        matrixBot.subscribeContent { event -> handleEncryptedTextMessage(commands, event, matrixClient, matrixBot, config) }
+        matrixBot.subscribeContent<MemberEventContent> { event -> handleJoinsToMatrixJoinLinkRooms(event, event.content, matrixBot, config) }
 
         val loggedOut = matrixBot.startBlocking()
         if (loggedOut) {

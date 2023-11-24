@@ -62,15 +62,15 @@ internal class UnlinkCommand(private val config: Config) : Command() {
         matrixBot.sendStateEvent(targetRoom, JoinLinkEventContent())
         matrixBot.sendStateEvent(currentJoinLink, RoomToJoinEventContent())
 
-        val usersOfRoom = matrixBot.rooms().getMembers(currentJoinLink).getOrThrow()
+        val usersOfRoom = matrixBot.roomApi().getMembers(currentJoinLink).getOrThrow()
         for (user in usersOfRoom) {
             if (user.sender.full == matrixBot.self().full || user.content.membership != Membership.JOIN) {
                 continue
             }
-            matrixBot.rooms().banUser(currentJoinLink, user.sender, reason = "Matrix Join Link invalidated").getOrThrow()
+            matrixBot.roomApi().banUser(currentJoinLink, user.sender, reason = "Matrix Join Link invalidated").getOrThrow()
         }
 
-        matrixBot.rooms().leaveRoom(currentJoinLink, reason = "Matrix Join Link invalidated")
+        matrixBot.roomApi().leaveRoom(currentJoinLink, reason = "Matrix Join Link invalidated")
         matrixBot.room().sendMessage(roomId) { text("Unlinked the Room") }
     }
 }
