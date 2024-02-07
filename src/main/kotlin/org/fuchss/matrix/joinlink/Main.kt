@@ -40,7 +40,11 @@ fun main() {
                 HelpCommand(config, "JoinLink") {
                     commands
                 },
-                QuitCommand(config), LogoutCommand(config), ChangeUsernameCommand(), LinkCommand(config), UnlinkCommand(config)
+                QuitCommand(config),
+                LogoutCommand(config),
+                ChangeUsernameCommand(),
+                LinkCommand(config),
+                UnlinkCommand(config)
             )
 
         val matrixClient = getMatrixClient(config)
