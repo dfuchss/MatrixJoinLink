@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.fuchss</groupId>
         <artifactId>maven-parent</artifactId>
-        <version>0.21.11</version>
+        <version>0.21.12</version>
     </parent>
 
     <groupId>org.fuchss.matrix</groupId>
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>org.fuchss</groupId>
             <artifactId>matrix-bot-base</artifactId>
-            <version>0.9.3</version>
+            <version>0.9.4</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
