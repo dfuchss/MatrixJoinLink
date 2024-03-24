@@ -3,7 +3,7 @@ package org.fuchss.matrix.joinlink
 import io.ktor.http.Url
 import kotlinx.coroutines.runBlocking
 import net.folivo.trixnity.client.MatrixClient
-import net.folivo.trixnity.client.createDefaultModules
+import net.folivo.trixnity.client.createDefaultTrixnityModules
 import net.folivo.trixnity.client.fromStore
 import net.folivo.trixnity.client.login
 import net.folivo.trixnity.clientserverapi.model.authentication.IdentifierType
@@ -66,7 +66,7 @@ fun main() {
 private suspend fun getMatrixClient(config: Config): MatrixClient {
     val existingMatrixClient =
         MatrixClient.fromStore(createRepositoriesModule(config), createMediaStore(config)) {
-            modules = createDefaultModules() + joinLinkModule
+            modules = createDefaultTrixnityModules() + joinLinkModule
         }.getOrThrow()
     if (existingMatrixClient != null) {
         return existingMatrixClient
@@ -81,7 +81,7 @@ private suspend fun getMatrixClient(config: Config): MatrixClient {
             mediaStore = createMediaStore(config),
             initialDeviceDisplayName = "${MatrixBot::class.java.`package`.name}-${Random.Default.nextInt()}"
         ) {
-            modules = createDefaultModules() + joinLinkModule
+            modules = createDefaultTrixnityModules() + joinLinkModule
         }.getOrThrow()
 
     return matrixClient
