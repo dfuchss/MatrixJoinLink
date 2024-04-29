@@ -3,7 +3,7 @@
 This bot allows the creation of join links to non-public rooms in matrix. It uses the [Trixnity](https://trixnity.gitlab.io/trixnity/) framework.
 The bot is currently in early alpha and primarily used as proof-of-concept.
 
-🔨 This project is in alpha. Feel free to use the matrix chat (see below). 🔨
+Feel free to use the matrix chat.
 
 ## Reason for this Bot
 
@@ -44,7 +44,7 @@ can invite _JoinLink_ and create an invite link. This link can be shared to my f
 
 ## Development
 
-Join our discussion at our matrix channel [#matrixjoinlink:fuchss.org](https://matrix.to/#/#matrixjoinlink:fuchss.org)
+I'm typically online in the [Trixnity channel](https://matrix.to/#/#trixnity:imbitbu.de). So feel free to tag me there if you have any questions.
 
 * The basic functionality is located in [Main.kt](src/main/kotlin/org/fuchss/matrix/joinlink/Main.kt). There you can also find the main method of the bot.
 
