@@ -10,7 +10,7 @@
 
     <groupId>org.fuchss.matrix</groupId>
     <artifactId>matrixjoinlink</artifactId>
-    <version>0.25.16-SNAPSHOT</version>
+    <version>0.26.0</version>
     <packaging>jar</packaging>
     <name>MatrixJoinLink</name>
 
