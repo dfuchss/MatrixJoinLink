@@ -45,11 +45,23 @@ internal class UnlinkCommand(private val config: Config) : Command() {
 
         logger.info("Requested Unlink for $targetRoom")
 
-        if (!matrixBot.canInvite(targetRoom, sender)) {
-            matrixBot.room().sendMessage(roomId) {
-                text("You are not allowed to invite users to this room (${targetRoom.matrixTo()}). Therefore, you cannot remove a join link.")
+        // Bot Admins are allowed to unlink rooms. Check permissions for non-bot-admins.
+        if (!config.isBotAdmin(sender)) {
+            // Check that the user is in the room
+            if (!matrixBot.roomApi().getJoinedMembers(targetRoom).getOrThrow().joined.containsKey(sender)) {
+                logger.info("User ${sender.full} is not in the room (${targetRoom.matrixTo()})")
+                matrixBot.room().sendMessage(roomId) { text("You are not in the room (${targetRoom.matrixTo()})") }
+                return
             }
-            return
+
+            // Check that the user is allowed to invite users to the room
+            if (!matrixBot.canInvite(targetRoom, sender)) {
+                logger.info("User ${sender.full} is not allowed to invite users to the room (${targetRoom.matrixTo()})")
+                matrixBot.room().sendMessage(roomId) {
+                    text("You are not allowed to invite users to this room (${targetRoom.matrixTo()}). Therefore, you cannot remove a join link.")
+                }
+                return
+            }
         }
 
         val currentJoinLink = matrixBot.getStateEvent<JoinLinkEventContent>(targetRoom).getOrNull()?.joinlinkRoom.decrypt(config)

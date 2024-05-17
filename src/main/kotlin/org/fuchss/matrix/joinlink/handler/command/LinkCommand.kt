@@ -53,14 +53,14 @@ internal class LinkCommand(private val config: Config) : Command() {
 
         logger.info("Requested Link for $targetRoom")
 
+        if (!hasPermissions(matrixBot, sender, roomId, targetRoom)) {
+            return
+        }
+
         val currentJoinLink = matrixBot.getStateEvent<JoinLinkEventContent>(targetRoom).getOrNull()?.joinlinkRoom.decrypt(config)
 
         if (currentJoinLink != null) {
             matrixBot.room().sendMessage(roomId) { text("Link to share the Room (${targetRoom.matrixTo()}): ${currentJoinLink.matrixTo()}") }
-            return
-        }
-
-        if (!hasPermissions(matrixBot, sender, roomId, targetRoom)) {
             return
         }
 
@@ -110,18 +110,28 @@ internal class LinkCommand(private val config: Config) : Command() {
         roomId: RoomId,
         targetRoom: RoomId
     ): Boolean {
+        // Check that the user is in the room
+        if (!matrixBot.roomApi().getJoinedMembers(targetRoom).getOrThrow().joined.containsKey(sender)) {
+            logger.info("User ${sender.full} is not in the room (${targetRoom.matrixTo()})")
+            matrixBot.room().sendMessage(roomId) { text("You are not in the room (${targetRoom.matrixTo()})") }
+            return false
+        }
+
+        // Check that user can invite
         if (!matrixBot.canInvite(targetRoom, sender)) {
             logger.info("User ${sender.full} is not allowed to invite users to this room (${targetRoom.matrixTo()})")
             matrixBot.room().sendMessage(roomId) { text("You are not allowed to invite users to this room (${targetRoom.matrixTo()})") }
             return false
         }
 
+        // Check that bot can invite
         if (!matrixBot.canInvite(targetRoom)) {
             logger.debug("I am not allowed to invite users to this room (${targetRoom.matrixTo()})")
             matrixBot.room().sendMessage(roomId) { text("I am not allowed to invite users to this room (${targetRoom.matrixTo()})") }
             return false
         }
 
+        // Check that bot can send state events
         if (!matrixBot.canSendStateEvents(targetRoom)) {
             logger.debug("I am not allowed to send state events to this room (${targetRoom.matrixTo()})")
             matrixBot.room().sendMessage(roomId) { text("I am not allowed to send state events to this room (${targetRoom.matrixTo()})") }
