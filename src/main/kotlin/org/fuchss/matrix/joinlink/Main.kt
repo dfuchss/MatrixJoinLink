@@ -8,8 +8,6 @@ import net.folivo.trixnity.client.fromStore
 import net.folivo.trixnity.client.login
 import net.folivo.trixnity.clientserverapi.model.authentication.IdentifierType
 import net.folivo.trixnity.core.model.events.m.room.MemberEventContent
-import net.folivo.trixnity.core.model.events.roomIdOrNull
-import net.folivo.trixnity.core.model.events.senderOrNull
 import org.fuchss.matrix.bots.MatrixBot
 import org.fuchss.matrix.bots.command.ChangeUsernameCommand
 import org.fuchss.matrix.bots.command.Command
@@ -18,8 +16,8 @@ import org.fuchss.matrix.bots.command.LogoutCommand
 import org.fuchss.matrix.bots.command.QuitCommand
 import org.fuchss.matrix.bots.helper.createMediaStore
 import org.fuchss.matrix.bots.helper.createRepositoriesModule
-import org.fuchss.matrix.bots.helper.handleEncryptedTextMessage
-import org.fuchss.matrix.bots.helper.handleTextMessage
+import org.fuchss.matrix.bots.helper.handleCommand
+import org.fuchss.matrix.bots.helper.handleEncryptedCommand
 import org.fuchss.matrix.joinlink.events.joinLinkModule
 import org.fuchss.matrix.joinlink.handler.command.LinkCommand
 import org.fuchss.matrix.joinlink.handler.command.UnlinkCommand
@@ -50,8 +48,8 @@ fun main() {
         val matrixClient = getMatrixClient(config)
 
         val matrixBot = MatrixBot(matrixClient, config)
-        matrixBot.subscribeContent { event -> handleTextMessage(commands, event.roomIdOrNull, event.senderOrNull, event.content, matrixBot, config) }
-        matrixBot.subscribeContent { event -> handleEncryptedTextMessage(commands, event, matrixClient, matrixBot, config) }
+        matrixBot.subscribeContent { event -> handleCommand(commands, event, matrixBot, config) }
+        matrixBot.subscribeContent { event -> handleEncryptedCommand(commands, event, matrixBot, config) }
         matrixBot.subscribeContent<MemberEventContent> { event -> handleJoinsToMatrixJoinLinkRooms(event, event.content, matrixBot, config) }
 
         val loggedOut = matrixBot.startBlocking()

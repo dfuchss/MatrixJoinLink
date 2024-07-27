@@ -1,9 +1,11 @@
 package org.fuchss.matrix.joinlink.handler.command
 
 import net.folivo.trixnity.client.room.message.text
+import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.Membership
+import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.fuchss.matrix.bots.MatrixBot
 import org.fuchss.matrix.bots.command.Command
 import org.fuchss.matrix.bots.helper.canInvite
@@ -22,16 +24,14 @@ internal class UnlinkCommand(private val config: Config) : Command() {
 
     /**
      * Unlink a Matrix Join Link Room. If you provided an internal link to a room, the bot will use this room instead of the room the message was sent in.
-     * @param[matrixBot] The bot to handle the unlink request.
-     * @param[sender] The sender of the command.
-     * @param[roomId] The roomId of the unlink request.
-     * @param[parameters] The parameters of the command.
      */
     override suspend fun execute(
         matrixBot: MatrixBot,
         sender: UserId,
         roomId: RoomId,
-        parameters: String
+        parameters: String,
+        textEventId: EventId,
+        textEvent: RoomMessageEventContent.TextBased.Text
     ) {
         val possibleTargetRoomId = parameters.trim()
         val providedRoomId = possibleTargetRoomId.toInternalRoomIdOrNull(matrixBot)

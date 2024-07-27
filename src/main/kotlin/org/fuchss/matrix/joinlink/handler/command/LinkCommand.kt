@@ -3,10 +3,12 @@ package org.fuchss.matrix.joinlink.handler.command
 import net.folivo.trixnity.client.room.message.text
 import net.folivo.trixnity.clientserverapi.model.rooms.CreateRoom
 import net.folivo.trixnity.clientserverapi.model.rooms.DirectoryVisibility
+import net.folivo.trixnity.core.model.EventId
 import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
 import net.folivo.trixnity.core.model.events.m.room.HistoryVisibilityEventContent
 import net.folivo.trixnity.core.model.events.m.room.PowerLevelsEventContent
+import net.folivo.trixnity.core.model.events.m.room.RoomMessageEventContent
 import org.fuchss.matrix.bots.MatrixBot
 import org.fuchss.matrix.bots.command.Command
 import org.fuchss.matrix.bots.helper.ADMIN_POWER_LEVEL
@@ -29,16 +31,14 @@ internal class LinkCommand(private val config: Config) : Command() {
     /**
      * Handle a link request. If the message originates from a user that is authorized, the bot tries to create a JoinLinkRoom (or uses an existing one).
      * If you provided an internal link to a room, the bot will use this room instead of the room the message was sent in.
-     * @param[matrixBot] The bot to handle the link request.
-     * @param[sender] The sender of the link request.
-     * @param[roomId] The roomId of the link request.
-     * @param[parameters] The parameters of the link request.
      */
     override suspend fun execute(
         matrixBot: MatrixBot,
         sender: UserId,
         roomId: RoomId,
-        parameters: String
+        parameters: String,
+        textEventId: EventId,
+        textEvent: RoomMessageEventContent.TextBased.Text
     ) {
         val possibleTargetRoomId = parameters.split(" ").first()
         val providedRoomId = possibleTargetRoomId.toInternalRoomIdOrNull(matrixBot)
