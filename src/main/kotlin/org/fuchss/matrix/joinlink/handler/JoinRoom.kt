@@ -64,9 +64,11 @@ internal suspend fun handleJoinsToMatrixJoinLinkRooms(
 
     // Cleanup recent list
     val now = Clock.System.now()
-    recentHandledJoinEventIdToTimestamp.toMap().filter {
-        now - Instant.fromEpochMilliseconds(it.value) > 20.seconds
-    }.forEach { recentHandledJoinEventIdToTimestamp.remove(it.key) }
+    recentHandledJoinEventIdToTimestamp
+        .toMap()
+        .filter {
+            now - Instant.fromEpochMilliseconds(it.value) > 20.seconds
+        }.forEach { recentHandledJoinEventIdToTimestamp.remove(it.key) }
 
     val eventId = event.idOrNull?.full ?: "$roomId-$userId"
     val originTimestamp = event.originTimestampOrNull ?: now.toEpochMilliseconds()
@@ -122,7 +124,12 @@ private suspend fun handleValidJoinEvent(
     }
 
     // Validate RoomsToJoin ..
-    val currentJoinLink = matrixBot.getStateEvent<JoinLinkEventContent>(roomToJoin).getOrNull()?.joinlinkRoom.decrypt(config)
+    val currentJoinLink =
+        matrixBot
+            .getStateEvent<JoinLinkEventContent>(roomToJoin)
+            .getOrNull()
+            ?.joinlinkRoom
+            .decrypt(config)
     if (currentJoinLink != roomId) {
         logger.error("I will not invite $userId to $roomToJoin because the link to $roomId is broken ($currentJoinLink <-> $roomId). Skipping ..")
         return

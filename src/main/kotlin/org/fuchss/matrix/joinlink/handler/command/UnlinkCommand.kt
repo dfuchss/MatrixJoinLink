@@ -17,7 +17,9 @@ import org.fuchss.matrix.joinlink.events.JoinLinkEventContent
 import org.fuchss.matrix.joinlink.events.RoomToJoinEventContent
 import org.fuchss.matrix.joinlink.helper.decrypt
 
-internal class UnlinkCommand(private val config: Config) : Command() {
+internal class UnlinkCommand(
+    private val config: Config
+) : Command() {
     override val name: String = "unlink"
     override val params: String = "[Link/ID to TargetRoom]"
     override val help: String = "remove all join links for the room"
@@ -48,7 +50,13 @@ internal class UnlinkCommand(private val config: Config) : Command() {
         // Bot Admins are allowed to unlink rooms. Check permissions for non-bot-admins.
         if (!config.isBotAdmin(sender)) {
             // Check that the user is in the room
-            if (!matrixBot.roomApi().getJoinedMembers(targetRoom).getOrThrow().joined.containsKey(sender)) {
+            if (!matrixBot
+                    .roomApi()
+                    .getJoinedMembers(targetRoom)
+                    .getOrThrow()
+                    .joined
+                    .containsKey(sender)
+            ) {
                 logger.info("User ${sender.full} is not in the room (${targetRoom.matrixTo()})")
                 matrixBot.room().sendMessage(roomId) { text("You are not in the room (${targetRoom.matrixTo()})") }
                 return
@@ -64,7 +72,12 @@ internal class UnlinkCommand(private val config: Config) : Command() {
             }
         }
 
-        val currentJoinLink = matrixBot.getStateEvent<JoinLinkEventContent>(targetRoom).getOrNull()?.joinlinkRoom.decrypt(config)
+        val currentJoinLink =
+            matrixBot
+                .getStateEvent<JoinLinkEventContent>(targetRoom)
+                .getOrNull()
+                ?.joinlinkRoom
+                .decrypt(config)
 
         if (currentJoinLink == null) {
             matrixBot.room().sendMessage(roomId) { text("No Matrix Join Links available .. nothing to do ..") }

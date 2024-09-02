@@ -63,24 +63,26 @@ fun main() {
 
 private suspend fun getMatrixClient(config: Config): MatrixClient {
     val existingMatrixClient =
-        MatrixClient.fromStore(createRepositoriesModule(config), createMediaStore(config)) {
-            modules = createDefaultTrixnityModules() + joinLinkModule
-        }.getOrThrow()
+        MatrixClient
+            .fromStore(createRepositoriesModule(config), createMediaStore(config)) {
+                modules = createDefaultTrixnityModules() + joinLinkModule
+            }.getOrThrow()
     if (existingMatrixClient != null) {
         return existingMatrixClient
     }
 
     val matrixClient =
-        MatrixClient.login(
-            baseUrl = Url(config.baseUrl),
-            identifier = IdentifierType.User(config.username),
-            password = config.password,
-            repositoriesModule = createRepositoriesModule(config),
-            mediaStore = createMediaStore(config),
-            initialDeviceDisplayName = "${MatrixBot::class.java.`package`.name}-${Random.Default.nextInt()}"
-        ) {
-            modules = createDefaultTrixnityModules() + joinLinkModule
-        }.getOrThrow()
+        MatrixClient
+            .login(
+                baseUrl = Url(config.baseUrl),
+                identifier = IdentifierType.User(config.username),
+                password = config.password,
+                repositoriesModule = createRepositoriesModule(config),
+                mediaStore = createMediaStore(config),
+                initialDeviceDisplayName = "${MatrixBot::class.java.`package`.name}-${Random.Default.nextInt()}"
+            ) {
+                modules = createDefaultTrixnityModules() + joinLinkModule
+            }.getOrThrow()
 
     return matrixClient
 }

@@ -23,7 +23,9 @@ import org.fuchss.matrix.joinlink.events.RoomToJoinEventContent
 import org.fuchss.matrix.joinlink.helper.decrypt
 import org.fuchss.matrix.joinlink.helper.encrypt
 
-internal class LinkCommand(private val config: Config) : Command() {
+internal class LinkCommand(
+    private val config: Config
+) : Command() {
     override val name: String = "link"
     override val params: String = "[Link/ID to TargetRoom] {Readable Name of Link}"
     override val help: String = "create a join link for the room (if none provided, the room the message was sent in is used)"
@@ -57,7 +59,12 @@ internal class LinkCommand(private val config: Config) : Command() {
             return
         }
 
-        val currentJoinLink = matrixBot.getStateEvent<JoinLinkEventContent>(targetRoom).getOrNull()?.joinlinkRoom.decrypt(config)
+        val currentJoinLink =
+            matrixBot
+                .getStateEvent<JoinLinkEventContent>(targetRoom)
+                .getOrNull()
+                ?.joinlinkRoom
+                .decrypt(config)
 
         if (currentJoinLink != null) {
             matrixBot.room().sendMessage(roomId) { text("Link to share the Room (${targetRoom.matrixTo()}): ${currentJoinLink.matrixTo()}") }
@@ -73,23 +80,25 @@ internal class LinkCommand(private val config: Config) : Command() {
 
         // Create Join Room
         val joinLink =
-            matrixBot.roomApi().createRoom(
-                visibility = DirectoryVisibility.PRIVATE,
-                name = "Matrix Join Link '$nameOfLink'",
-                topic = "This is the Matrix Join Link Room called '$nameOfLink'. You can leave the room :)",
-                preset = CreateRoom.Request.Preset.PUBLIC,
-                powerLevelContentOverride =
-                    PowerLevelsEventContent(
-                        users = mapOf(matrixBot.self() to ADMIN_POWER_LEVEL),
-                        events =
-                            mapOf(
-                                RoomToJoinEventContent.ID to ADMIN_POWER_LEVEL,
-                                JoinLinkEventContent.ID to ADMIN_POWER_LEVEL
-                            ),
-                        eventsDefault = ADMIN_POWER_LEVEL,
-                        stateDefault = ADMIN_POWER_LEVEL
-                    )
-            ).getOrThrow()
+            matrixBot
+                .roomApi()
+                .createRoom(
+                    visibility = DirectoryVisibility.PRIVATE,
+                    name = "Matrix Join Link '$nameOfLink'",
+                    topic = "This is the Matrix Join Link Room called '$nameOfLink'. You can leave the room :)",
+                    preset = CreateRoom.Request.Preset.PUBLIC,
+                    powerLevelContentOverride =
+                        PowerLevelsEventContent(
+                            users = mapOf(matrixBot.self() to ADMIN_POWER_LEVEL),
+                            events =
+                                mapOf(
+                                    RoomToJoinEventContent.ID to ADMIN_POWER_LEVEL,
+                                    JoinLinkEventContent.ID to ADMIN_POWER_LEVEL
+                                ),
+                            eventsDefault = ADMIN_POWER_LEVEL,
+                            stateDefault = ADMIN_POWER_LEVEL
+                        )
+                ).getOrThrow()
 
         // Set History Visibility to Joined to prevent others from seeing too much history
         matrixBot.roomApi().sendStateEvent(joinLink, HistoryVisibilityEventContent(HistoryVisibilityEventContent.HistoryVisibility.JOINED)).getOrThrow()
@@ -111,7 +120,13 @@ internal class LinkCommand(private val config: Config) : Command() {
         targetRoom: RoomId
     ): Boolean {
         // Check that the user is in the room
-        if (!matrixBot.roomApi().getJoinedMembers(targetRoom).getOrThrow().joined.containsKey(sender)) {
+        if (!matrixBot
+                .roomApi()
+                .getJoinedMembers(targetRoom)
+                .getOrThrow()
+                .joined
+                .containsKey(sender)
+        ) {
             logger.info("User ${sender.full} is not in the room (${targetRoom.matrixTo()})")
             matrixBot.room().sendMessage(roomId) { text("You are not in the room (${targetRoom.matrixTo()})") }
             return false
