@@ -1,9 +1,6 @@
 # MatrixJoinLink - A bot that allows the creation of Join Links to non-public Rooms in Matrix
 
 This bot allows the creation of join links to non-public rooms in matrix. It uses the [Trixnity](https://trixnity.gitlab.io/trixnity/) framework.
-The bot is currently in early alpha and primarily used as proof-of-concept.
-
-Feel free to use the matrix chat.
 
 ## Reason for this Bot
 
