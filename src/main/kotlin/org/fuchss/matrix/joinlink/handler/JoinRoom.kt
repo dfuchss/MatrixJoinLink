@@ -1,7 +1,7 @@
+@file:OptIn(ExperimentalTime::class)
+
 package org.fuchss.matrix.joinlink.handler
 
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import net.folivo.trixnity.client.room.message.text
 import net.folivo.trixnity.core.model.RoomId
 import net.folivo.trixnity.core.model.UserId
@@ -23,7 +23,10 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Semaphore
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 private val recentHandledJoinEventIdToTimestamp = ConcurrentHashMap<String, Long>()
 private val userIdLocks = ConcurrentHashMap<UserId, Semaphore>()

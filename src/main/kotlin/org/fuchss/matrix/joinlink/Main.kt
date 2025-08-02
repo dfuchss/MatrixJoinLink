@@ -3,7 +3,7 @@ package org.fuchss.matrix.joinlink
 import io.ktor.http.Url
 import kotlinx.coroutines.runBlocking
 import net.folivo.trixnity.client.MatrixClient
-import net.folivo.trixnity.client.createDefaultTrixnityModules
+import net.folivo.trixnity.client.createTrixnityDefaultModuleFactories
 import net.folivo.trixnity.client.fromStore
 import net.folivo.trixnity.client.login
 import net.folivo.trixnity.clientserverapi.model.authentication.IdentifierType
@@ -14,7 +14,7 @@ import org.fuchss.matrix.bots.command.Command
 import org.fuchss.matrix.bots.command.HelpCommand
 import org.fuchss.matrix.bots.command.LogoutCommand
 import org.fuchss.matrix.bots.command.QuitCommand
-import org.fuchss.matrix.bots.helper.createMediaStore
+import org.fuchss.matrix.bots.helper.createMediaStoreModule
 import org.fuchss.matrix.bots.helper.createRepositoriesModule
 import org.fuchss.matrix.bots.helper.handleCommand
 import org.fuchss.matrix.bots.helper.handleEncryptedCommand
@@ -64,8 +64,8 @@ fun main() {
 private suspend fun getMatrixClient(config: Config): MatrixClient {
     val existingMatrixClient =
         MatrixClient
-            .fromStore(createRepositoriesModule(config), createMediaStore(config)) {
-                modules = createDefaultTrixnityModules() + joinLinkModule
+            .fromStore(createRepositoriesModule(config), createMediaStoreModule(config)) {
+                modulesFactories = createTrixnityDefaultModuleFactories() + ::joinLinkModule
             }.getOrThrow()
     if (existingMatrixClient != null) {
         return existingMatrixClient
@@ -78,10 +78,10 @@ private suspend fun getMatrixClient(config: Config): MatrixClient {
                 identifier = IdentifierType.User(config.username),
                 password = config.password,
                 repositoriesModule = createRepositoriesModule(config),
-                mediaStore = createMediaStore(config),
+                mediaStoreModule = createMediaStoreModule(config),
                 initialDeviceDisplayName = "${MatrixBot::class.java.`package`.name}-${Random.Default.nextInt()}"
             ) {
-                modules = createDefaultTrixnityModules() + joinLinkModule
+                modulesFactories = createTrixnityDefaultModuleFactories() + ::joinLinkModule
             }.getOrThrow()
 
     return matrixClient
